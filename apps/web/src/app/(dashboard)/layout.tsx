@@ -7,7 +7,8 @@ import {
   LayoutDashboard, Briefcase, Users, MapPin, LogOut,
   Menu, X, ChevronRight, Bell, Settings, Loader2,
   Store, Bookmark, FileText, UserCircle, ClipboardList,
-  Building2, BarChart2, Shield, Zap,
+  Building2, BarChart2, Shield, Zap, FolderKanban,
+  CalendarCheck, Wallet, AlertCircle, Building,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/auth.store';
 
@@ -21,33 +22,44 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   // Worker
-  { label: 'Dashboard',       href: '/worker',                  icon: LayoutDashboard, roles: ['WORKER'],                            section: 'main' },
-  { label: 'Browse Jobs',     href: '/marketplace',             icon: Store,           roles: ['WORKER'],                            section: 'jobs' },
-  { label: 'My Applications', href: '/worker/applications',     icon: FileText,        roles: ['WORKER'],                            section: 'jobs' },
-  { label: 'Saved Jobs',      href: '/worker/saved',            icon: Bookmark,        roles: ['WORKER'],                            section: 'jobs' },
-  { label: 'My Profile',      href: '/worker/profile',          icon: UserCircle,      roles: ['WORKER'],                            section: 'account' },
+  { label: 'Dashboard',       href: '/worker',                      icon: LayoutDashboard, roles: ['WORKER'],            section: 'main' },
+  { label: 'Browse Jobs',     href: '/marketplace',                 icon: Store,           roles: ['WORKER'],            section: 'jobs' },
+  { label: 'My Applications', href: '/worker/applications',         icon: FileText,        roles: ['WORKER'],            section: 'jobs' },
+  { label: 'Saved Jobs',      href: '/worker/saved',                icon: Bookmark,        roles: ['WORKER'],            section: 'jobs' },
+  { label: 'My Profile',      href: '/worker/profile',              icon: UserCircle,      roles: ['WORKER'],            section: 'account' },
 
   // Contractor
-  { label: 'Dashboard',       href: '/contractor',              icon: LayoutDashboard, roles: ['CONTRACTOR'],                        section: 'main' },
-  { label: 'Post a Job',      href: '/contractor/jobs/new',     icon: Briefcase,       roles: ['CONTRACTOR'],                        section: 'jobs' },
-  { label: 'My Jobs',         href: '/contractor/jobs',         icon: ClipboardList,   roles: ['CONTRACTOR'],                        section: 'jobs' },
-  { label: 'Applications',    href: '/contractor/applications', icon: FileText,        roles: ['CONTRACTOR'],                        section: 'jobs' },
-  { label: 'Workers',         href: '/workers',                 icon: Users,           roles: ['CONTRACTOR'],                        section: 'team' },
-  { label: 'Sites',           href: '/sites',                   icon: MapPin,          roles: ['CONTRACTOR'],                        section: 'team' },
+  { label: 'Dashboard',       href: '/contractor',                  icon: LayoutDashboard, roles: ['CONTRACTOR'],        section: 'main' },
+  { label: 'Post a Job',      href: '/contractor/jobs/new',         icon: Briefcase,       roles: ['CONTRACTOR'],        section: 'jobs' },
+  { label: 'My Jobs',         href: '/contractor/jobs',             icon: ClipboardList,   roles: ['CONTRACTOR'],        section: 'jobs' },
+  { label: 'Applications',    href: '/contractor/applications',     icon: FileText,        roles: ['CONTRACTOR'],        section: 'jobs' },
+  { label: 'Workers',         href: '/workers',                     icon: Users,           roles: ['CONTRACTOR'],        section: 'team' },
+  { label: 'Sites',           href: '/sites',                       icon: MapPin,          roles: ['CONTRACTOR'],        section: 'team' },
+  { label: 'Projects',        href: '/contractor/projects',         icon: FolderKanban,    roles: ['CONTRACTOR'],        section: 'operations' },
+  { label: 'Attendance',      href: '/contractor/attendance',       icon: CalendarCheck,   roles: ['CONTRACTOR'],        section: 'operations' },
+  { label: 'Payroll',         href: '/contractor/payroll',          icon: Wallet,          roles: ['CONTRACTOR'],        section: 'operations' },
+  { label: 'Compliance',      href: '/contractor/compliance',       icon: Shield,          roles: ['CONTRACTOR'],        section: 'operations' },
 
-  // Admin
-  { label: 'Dashboard',       href: '/admin',                   icon: LayoutDashboard, roles: ['SUPER_ADMIN', 'COMPANY_ADMIN'],      section: 'main' },
-  { label: 'Workers',         href: '/workers',                 icon: Users,           roles: ['SUPER_ADMIN', 'COMPANY_ADMIN'],      section: 'manage' },
-  { label: 'Contractors',     href: '/contractors',             icon: Briefcase,       roles: ['SUPER_ADMIN', 'COMPANY_ADMIN'],      section: 'manage' },
-  { label: 'Companies',       href: '/admin/companies',         icon: Building2,       roles: ['SUPER_ADMIN'],                       section: 'manage' },
-  { label: 'Verifications',   href: '/admin/kyc',               icon: Shield,          roles: ['SUPER_ADMIN', 'COMPANY_ADMIN'],      section: 'manage' },
-  { label: 'Complaints',      href: '/admin/complaints',        icon: FileText,        roles: ['SUPER_ADMIN', 'COMPANY_ADMIN'],      section: 'manage' },
-  { label: 'Analytics',       href: '/admin/analytics',         icon: BarChart2,       roles: ['SUPER_ADMIN', 'COMPANY_ADMIN'],      section: 'manage' },
-  { label: 'Settings',        href: '/admin/settings',          icon: Settings,        roles: ['SUPER_ADMIN'],                       section: 'manage' },
+  // Company Admin
+  { label: 'Dashboard',       href: '/company',                     icon: LayoutDashboard, roles: ['COMPANY_ADMIN'],     section: 'main' },
+  { label: 'My Company',      href: '/company/profile',             icon: Building,        roles: ['COMPANY_ADMIN'],     section: 'company' },
+  { label: 'Contractors',     href: '/company/contractors',         icon: Briefcase,       roles: ['COMPANY_ADMIN'],     section: 'company' },
+  { label: 'Workforce',       href: '/company/workforce',           icon: Users,           roles: ['COMPANY_ADMIN'],     section: 'company' },
+  { label: 'Compliance',      href: '/company/compliance',          icon: AlertCircle,     roles: ['COMPANY_ADMIN'],     section: 'company' },
+
+  // Super Admin
+  { label: 'Dashboard',       href: '/admin',                       icon: LayoutDashboard, roles: ['SUPER_ADMIN'],       section: 'main' },
+  { label: 'Workers',         href: '/workers',                     icon: Users,           roles: ['SUPER_ADMIN'],       section: 'manage' },
+  { label: 'Contractors',     href: '/contractors',                 icon: Briefcase,       roles: ['SUPER_ADMIN'],       section: 'manage' },
+  { label: 'Companies',       href: '/admin/companies',             icon: Building2,       roles: ['SUPER_ADMIN'],       section: 'manage' },
+  { label: 'Verifications',   href: '/admin/kyc',                   icon: Shield,          roles: ['SUPER_ADMIN'],       section: 'manage' },
+  { label: 'Analytics',       href: '/admin/analytics',             icon: BarChart2,       roles: ['SUPER_ADMIN'],       section: 'manage' },
+  { label: 'Settings',        href: '/admin/settings',              icon: Settings,        roles: ['SUPER_ADMIN'],       section: 'manage' },
 ];
 
 const SECTION_LABELS: Record<string, string> = {
-  main: '', jobs: 'Jobs', team: 'Team', manage: 'Manage', account: 'Account',
+  main: '', jobs: 'Jobs', team: 'Team', operations: 'Operations',
+  company: 'Company', manage: 'Manage', account: 'Account',
 };
 
 // ─── Role-based theme ────────────────────────────────────────────────────────
@@ -206,7 +218,7 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   };
 
   const logoTextColor = theme.dark ? 'text-white' : 'text-slate-900';
-  const subTextColor = theme.dark ? 'text-slate-400' : 'text-slate-500';
+  const _subTextColor = theme.dark ? 'text-slate-400' : 'text-slate-500';
   const dividerColor = theme.dark ? 'border-slate-700/60' : 'border-slate-100';
   const nameColor = theme.dark ? 'text-slate-100' : 'text-slate-800';
 
@@ -371,6 +383,15 @@ function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
     if (pathname.startsWith('/contractor/jobs/new')) return 'Post a Job';
     if (pathname.startsWith('/contractor/jobs')) return 'My Jobs';
     if (pathname.startsWith('/contractor/applications')) return 'Applications';
+    if (pathname.startsWith('/contractor/projects')) return 'Projects';
+    if (pathname.startsWith('/contractor/attendance')) return 'Attendance';
+    if (pathname.startsWith('/contractor/payroll')) return 'Payroll';
+    if (pathname.startsWith('/contractor/compliance')) return 'Compliance';
+    if (pathname === '/company') return 'Company Dashboard';
+    if (pathname.startsWith('/company/profile')) return 'My Company';
+    if (pathname.startsWith('/company/contractors')) return 'Contractors';
+    if (pathname.startsWith('/company/workforce')) return 'Workforce';
+    if (pathname.startsWith('/company/compliance')) return 'Compliance';
     if (pathname === '/admin') return 'Admin Dashboard';
     if (pathname.startsWith('/admin/kyc')) return 'Verifications';
     if (pathname.startsWith('/admin/analytics')) return 'Analytics';

@@ -439,9 +439,233 @@ async function main() {
   });
   console.log('✅  Worker Ratings');
 
+  // ── DAY 3: Projects ────────────────────────────────────────────────
+  await prisma.project.createMany({
+    data: [
+      {
+        id: 'prj_01', contractorId: 'con_01', companyId: 'cmp_01',
+        name: 'Bandra Kurla Complex Tower A', code: 'BKC-TOWER-A',
+        status: 'ACTIVE', budget: 45000000,
+        startDate: d(-90), endDate: d(180),
+        city: 'Mumbai', state: 'Maharashtra',
+        address: 'Plot 12, BKC, Bandra East, Mumbai - 400051',
+        latitude: 19.0645, longitude: 72.8679,
+        totalWorkers: 18,
+        description: 'Construction of 28-storey commercial tower in BKC',
+      },
+      {
+        id: 'prj_02', contractorId: 'con_01', companyId: 'cmp_01',
+        name: 'Andheri Residential Complex', code: 'ANDHERI-RES-01',
+        status: 'ACTIVE', budget: 22000000,
+        startDate: d(-45), endDate: d(120),
+        city: 'Mumbai', state: 'Maharashtra',
+        address: 'Andheri West, Mumbai - 400058',
+        latitude: 19.1197, longitude: 72.8468,
+        totalWorkers: 12,
+        description: 'Residential complex with 150 units in Andheri West',
+      },
+      {
+        id: 'prj_03', contractorId: 'con_02', companyId: 'cmp_02',
+        name: 'Connaught Place Office Renovation', code: 'CP-OFFICE-REN',
+        status: 'ACTIVE', budget: 8500000,
+        startDate: d(-20), endDate: d(60),
+        city: 'Delhi', state: 'Delhi',
+        address: 'Block A, Connaught Place, New Delhi - 110001',
+        latitude: 28.6315, longitude: 77.2167,
+        totalWorkers: 8,
+        description: 'Full interior renovation of 3-floor commercial office space',
+      },
+      {
+        id: 'prj_04', contractorId: 'con_03', companyId: 'cmp_01',
+        name: 'Whitefield IT Park Electrical', code: 'WF-ELEC-01',
+        status: 'PLANNING', budget: 15000000,
+        startDate: d(10), endDate: d(150),
+        city: 'Bangalore', state: 'Karnataka',
+        address: 'EPIP Zone, Whitefield, Bangalore - 560066',
+        latitude: 12.9698, longitude: 77.7499,
+        totalWorkers: 0,
+        description: 'Electrical installation for new IT park complex',
+      },
+      {
+        id: 'prj_05', contractorId: 'con_04', companyId: 'cmp_03',
+        name: 'Chennai Smart City Plumbing', code: 'CSC-PLUMB-01',
+        status: 'COMPLETED', budget: 5000000,
+        startDate: d(-180), endDate: d(-15),
+        city: 'Chennai', state: 'Tamil Nadu',
+        address: 'Anna Nagar, Chennai - 600040',
+        latitude: 13.0858, longitude: 80.2100,
+        totalWorkers: 10,
+        description: 'Complete plumbing overhaul for smart city housing project',
+      },
+    ],
+    skipDuplicates: true,
+  });
+  console.log('✅  Projects (5)');
+
+  // Link sites to projects
+  await prisma.projectSite.createMany({
+    data: [
+      { projectId: 'prj_01', siteId: 'site_01' },
+      { projectId: 'prj_02', siteId: 'site_02' },
+      { projectId: 'prj_03', siteId: 'site_03' },
+      { projectId: 'prj_04', siteId: 'site_04' },
+      { projectId: 'prj_05', siteId: 'site_05' },
+    ],
+    skipDuplicates: true,
+  });
+  console.log('✅  Project Sites');
+
+  // ── DAY 3: Workforce Assignments ───────────────────────────────────
+  await prisma.workforceAssignment.createMany({
+    data: [
+      { id: 'wa_01', projectId: 'prj_01', workerId: 'wkr_01', contractorId: 'con_01', siteId: 'site_01', role: 'Lead Mason',       startDate: d(-85), dailyRate: 800,  isActive: true },
+      { id: 'wa_02', projectId: 'prj_01', workerId: 'wkr_15', contractorId: 'con_01', siteId: 'site_01', role: 'Mason',            startDate: d(-80), dailyRate: 750,  isActive: true },
+      { id: 'wa_03', projectId: 'prj_01', workerId: 'wkr_09', contractorId: 'con_01', siteId: 'site_01', role: 'Plumber',          startDate: d(-70), dailyRate: 850,  isActive: true },
+      { id: 'wa_04', projectId: 'prj_02', workerId: 'wkr_05', contractorId: 'con_01', siteId: 'site_02', role: 'Lead Carpenter',   startDate: d(-40), dailyRate: 900,  isActive: true },
+      { id: 'wa_05', projectId: 'prj_02', workerId: 'wkr_17', contractorId: 'con_01', siteId: 'site_02', role: 'Carpenter',        startDate: d(-40), dailyRate: 800,  isActive: true },
+      { id: 'wa_06', projectId: 'prj_03', workerId: 'wkr_07', contractorId: 'con_02', siteId: 'site_03', role: 'Welder',           startDate: d(-18), dailyRate: 950,  isActive: true },
+      { id: 'wa_07', projectId: 'prj_03', workerId: 'wkr_04', contractorId: 'con_02', siteId: 'site_03', role: 'Painter',          startDate: d(-15), dailyRate: 600,  isActive: true },
+      { id: 'wa_08', projectId: 'prj_05', workerId: 'wkr_09', contractorId: 'con_04', siteId: 'site_05', role: 'Lead Plumber',     startDate: d(-175), endDate: d(-15), dailyRate: 850, isActive: false },
+      { id: 'wa_09', projectId: 'prj_05', workerId: 'wkr_06', contractorId: 'con_04', siteId: 'site_05', role: 'Plumber',          startDate: d(-175), endDate: d(-15), dailyRate: 700, isActive: false },
+    ],
+    skipDuplicates: true,
+  });
+  console.log('✅  Workforce Assignments (9)');
+
+  // ── DAY 3: Compliance Records ──────────────────────────────────────
+  await prisma.complianceRecord.createMany({
+    data: [
+      { id: 'cmp_rec_01', contractorId: 'con_01', projectId: 'prj_01', companyId: 'cmp_01', type: 'LABOR_LICENSE',   title: 'Labour License — BKC Tower A',           status: 'COMPLETED', dueDate: d(-60), completedAt: d(-65), referenceNo: 'MH-LL-2024-001', issuedBy: 'Dept of Labour, Maharashtra' },
+      { id: 'cmp_rec_02', contractorId: 'con_01', projectId: 'prj_01', companyId: 'cmp_01', type: 'SAFETY_AUDIT',    title: 'Q2 Safety Audit — BKC Tower A',          status: 'COMPLETED', dueDate: d(-30), completedAt: d(-35), referenceNo: 'SA-Q2-2024-BKC', issuedBy: 'Safety Inspector' },
+      { id: 'cmp_rec_03', contractorId: 'con_01', projectId: 'prj_01', companyId: 'cmp_01', type: 'PF_REGISTRATION', title: 'PF Registration — BKC Tower A',          status: 'COMPLETED', dueDate: d(-80), completedAt: d(-82), referenceNo: 'EPFO-MH-2024-112' },
+      { id: 'cmp_rec_04', contractorId: 'con_01', projectId: 'prj_02', type: 'SAFETY_AUDIT',    title: 'Site Safety Audit — Andheri Residential', status: 'PENDING',    dueDate: d(15), notes: 'Inspector visit scheduled' },
+      { id: 'cmp_rec_05', contractorId: 'con_01', projectId: 'prj_02', type: 'BUILDING_PERMIT', title: 'Building Permit Renewal',                 status: 'IN_PROGRESS', dueDate: d(7),  notes: 'Documents submitted to BMC', referenceNo: 'BMC-BP-2025-0441' },
+      { id: 'cmp_rec_06', contractorId: 'con_02', projectId: 'prj_03', type: 'GST_FILING',      title: 'GST Q2 Filing',                           status: 'OVERDUE',     dueDate: d(-5), notes: 'Accountant follow-up needed' },
+      { id: 'cmp_rec_07', contractorId: 'con_03', projectId: 'prj_04', type: 'LABOR_LICENSE',   title: 'Labour License — Whitefield IT Park',     status: 'PENDING',     dueDate: d(25), notes: 'Apply before project start' },
+      { id: 'cmp_rec_08', contractorId: 'con_03', projectId: 'prj_04', type: 'FIRE_NOC',        title: 'Fire NOC — Whitefield IT Park',            status: 'PENDING',     dueDate: d(20), notes: 'Fire dept inspection required' },
+      { id: 'cmp_rec_09', contractorId: 'con_04', projectId: 'prj_05', type: 'ESI_REGISTRATION','title': 'ESI Registration — Chennai',              status: 'COMPLETED',   dueDate: d(-170), completedAt: d(-172), referenceNo: 'ESIC-TN-2024-557' },
+      { id: 'cmp_rec_10', contractorId: 'con_05', type: 'GST_FILING',      title: 'GST Annual Return Filing 2024',           status: 'PENDING',     dueDate: d(45) },
+    ],
+    skipDuplicates: true,
+  });
+  console.log('✅  Compliance Records (10)');
+
+  // ── DAY 3: Attendance Records ──────────────────────────────────────
+  const attRecords = [];
+  const workerSiteJobPairs = [
+    { workerId: 'wkr_01', jobId: 'job_01', siteId: 'site_01', contractorId: 'con_01' },
+    { workerId: 'wkr_09', jobId: 'job_05', siteId: 'site_01', contractorId: 'con_01' },
+    { workerId: 'wkr_03', jobId: 'job_11', siteId: 'site_04', contractorId: 'con_03' },
+    { workerId: 'wkr_13', jobId: 'job_11', siteId: 'site_04', contractorId: 'con_03' },
+    { workerId: 'wkr_07', jobId: 'job_21', siteId: 'site_05', contractorId: 'con_05' },
+  ];
+
+  for (const pair of workerSiteJobPairs) {
+    for (let day = 14; day >= 0; day--) {
+      if (Math.random() > 0.15) { // ~85% attendance rate
+        const checkIn = new Date();
+        checkIn.setDate(checkIn.getDate() - day);
+        checkIn.setHours(8, Math.floor(Math.random() * 30), 0, 0);
+        const checkOut = new Date(checkIn);
+        checkOut.setHours(17 + Math.floor(Math.random() * 2), Math.floor(Math.random() * 60), 0, 0);
+        const totalHours = parseFloat(((checkOut.getTime() - checkIn.getTime()) / 3_600_000).toFixed(2));
+
+        attRecords.push({
+          workerId: pair.workerId,
+          jobId: pair.jobId,
+          siteId: pair.siteId,
+          contractorId: pair.contractorId,
+          checkInTime: checkIn,
+          checkOutTime: checkOut,
+          totalHours,
+          method: 'MANUAL' as const,
+          geoFenceValid: true,
+          isFlagged: false,
+        });
+      }
+    }
+  }
+
+  await prisma.attendanceRecord.createMany({ data: attRecords, skipDuplicates: true });
+  console.log(`✅  Attendance Records (~${attRecords.length})`);
+
+  // ── DAY 3: Payroll Batch ──────────────────────────────────────────
+  await prisma.payrollBatch.createMany({
+    data: [
+      {
+        id: 'batch_01', contractorId: 'con_01', jobId: 'job_01',
+        periodStart: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1),
+        periodEnd:   new Date(new Date().getFullYear(), new Date().getMonth(), 0),
+        status: 'COMPLETED', totalWorkers: 2, totalAmount: 36400,
+        processedAt: d(-2), approvedAt: d(-2),
+        notes: 'April payroll - BKC Tower A',
+      },
+      {
+        id: 'batch_02', contractorId: 'con_01', jobId: 'job_05',
+        periodStart: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1),
+        periodEnd:   new Date(new Date().getFullYear(), new Date().getMonth(), 0),
+        status: 'COMPLETED', totalWorkers: 1, totalAmount: 18200,
+        processedAt: d(-2), approvedAt: d(-2),
+        notes: 'April payroll - Plumbing',
+      },
+      {
+        id: 'batch_03', contractorId: 'con_01',
+        periodStart: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+        periodEnd:   new Date(),
+        status: 'DRAFT', totalWorkers: 0, totalAmount: 0,
+        notes: 'May payroll - In progress',
+      },
+    ],
+    skipDuplicates: true,
+  });
+
+  await prisma.payrollRecord.createMany({
+    data: [
+      {
+        batchId: 'batch_01', workerId: 'wkr_01', jobId: 'job_01',
+        workingDays: 22, totalHours: 198, dailyWage: 800,
+        grossAmount: 17600, pfDeduction: 2112, esiDeduction: 132, otherDeductions: 0, netAmount: 15356,
+        paymentStatus: 'PAID', paidAt: d(-2),
+      },
+      {
+        batchId: 'batch_01', workerId: 'wkr_15', jobId: 'job_01',
+        workingDays: 24, totalHours: 216, dailyWage: 750,
+        grossAmount: 18000, pfDeduction: 2160, esiDeduction: 135, otherDeductions: 0, netAmount: 15705,
+        paymentStatus: 'PAID', paidAt: d(-2),
+      },
+      {
+        batchId: 'batch_02', workerId: 'wkr_09', jobId: 'job_05',
+        workingDays: 22, totalHours: 198, dailyWage: 850,
+        grossAmount: 18700, pfDeduction: 2244, esiDeduction: 140, otherDeductions: 0, netAmount: 16316,
+        paymentStatus: 'PAID', paidAt: d(-2),
+      },
+    ],
+    skipDuplicates: true,
+  });
+  console.log('✅  Payroll Batches + Records');
+
+  // ── DAY 3: Hire Records ───────────────────────────────────────────
+  await prisma.hireRecord.createMany({
+    data: [
+      { id: 'hr_01', applicationId: 'app_001', jobId: 'job_01', workerId: 'wkr_01', contractorId: 'con_01', siteId: 'site_01', agreedDailyWage: 800,  startDate: d(-85), isActive: true },
+      { id: 'hr_02', applicationId: 'app_006', jobId: 'job_02', workerId: 'wkr_01', contractorId: 'con_01', siteId: 'site_02', agreedDailyWage: 800,  startDate: d(-40), isActive: true },
+      { id: 'hr_03', applicationId: 'app_013', jobId: 'job_05', workerId: 'wkr_09', contractorId: 'con_01', siteId: 'site_01', agreedDailyWage: 850,  startDate: d(-70), isActive: true },
+      { id: 'hr_04', applicationId: 'app_016', jobId: 'job_06', workerId: 'wkr_05', contractorId: 'con_02', siteId: 'site_03', agreedDailyWage: 900,  startDate: d(-18), isActive: true },
+      { id: 'hr_05', applicationId: 'app_017', jobId: 'job_06', workerId: 'wkr_17', contractorId: 'con_02', siteId: 'site_03', agreedDailyWage: 800,  startDate: d(-18), isActive: true },
+      { id: 'hr_06', applicationId: 'app_018', jobId: 'job_06', workerId: 'wkr_07', contractorId: 'con_02', siteId: 'site_03', agreedDailyWage: 950,  startDate: d(-15), isActive: true },
+      { id: 'hr_07', applicationId: 'app_030', jobId: 'job_11', workerId: 'wkr_03', contractorId: 'con_03', siteId: 'site_04', agreedDailyWage: 950,  startDate: d(-55), isActive: true },
+      { id: 'hr_08', applicationId: 'app_031', jobId: 'job_11', workerId: 'wkr_13', contractorId: 'con_03', siteId: 'site_04', agreedDailyWage: 850,  startDate: d(-55), isActive: true },
+      { id: 'hr_09', applicationId: 'app_036', jobId: 'job_16', workerId: 'wkr_09', contractorId: 'con_04', siteId: 'site_05', agreedDailyWage: 850,  startDate: d(-175), endDate: d(-15), isActive: false },
+      { id: 'hr_10', applicationId: 'app_046', jobId: 'job_21', workerId: 'wkr_07', contractorId: 'con_05', siteId: 'site_05', agreedDailyWage: 950,  startDate: d(-60), isActive: true },
+      { id: 'hr_11', applicationId: 'app_047', jobId: 'job_21', workerId: 'wkr_17', contractorId: 'con_05', siteId: 'site_05', agreedDailyWage: 800,  startDate: d(-58), isActive: true },
+    ],
+    skipDuplicates: true,
+  });
+  console.log('✅  Hire Records (11)');
+
   console.log('\n🎉  Seed complete!');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log('📊  Records: 10 Locations | 18 Skills | 2 Admins | 3 Companies | 5 Contractors | 20 Workers | 5 Sites | 50 Jobs | 100 Applications');
+  console.log('📊  Records: Locations | Skills | Admins | Companies | Contractors | Workers | Sites | Jobs | Applications | Projects | WorkforceAssignments | Compliance | Attendance | Payroll');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 }
 

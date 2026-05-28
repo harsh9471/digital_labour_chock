@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import {
   ArrowLeft, MapPin, Clock, Users, DollarSign, Zap, Calendar,
-  Building2, Briefcase, Star, Eye, Share2, Bookmark, BookmarkCheck,
+  Building2, Briefcase, Star, Eye, Bookmark, BookmarkCheck,
   CheckCircle, X, AlertCircle, Send,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

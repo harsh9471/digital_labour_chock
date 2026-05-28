@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useAuthStore } from '@/store/auth.store';
-import { cn } from '@/lib/utils';
+import { cn as _cn } from '@/lib/utils';
 
 const schema = z.object({
   email: z.string().email('Enter a valid email address'),

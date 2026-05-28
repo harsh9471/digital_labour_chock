@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  Briefcase, MapPin, DollarSign, Users, Calendar, ChevronLeft,
+  Briefcase, MapPin, DollarSign, Calendar, ChevronLeft,
   Zap, FileText, Save, Send,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

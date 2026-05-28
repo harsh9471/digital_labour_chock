@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import {
-  Bookmark, MapPin, Briefcase, Clock, Zap, Trash2,
+  Bookmark, MapPin, Briefcase, Clock, Zap,
   Search, ArrowRight, SlidersHorizontal,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

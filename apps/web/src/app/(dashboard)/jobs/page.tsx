@@ -2,14 +2,12 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import {
-  Briefcase, Plus, Search, Filter, MapPin, Clock, Users,
-  ChevronRight, Loader2, AlertCircle, MoreVertical, Eye,
-  Send, X, CheckCircle, XCircle, Edit2,
+  Briefcase, Plus, Search, MapPin, Clock, Users,
+  ChevronRight, Loader2, AlertCircle, Eye,
+  Send,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
@@ -17,8 +15,7 @@ import { Label } from '@/components/ui/label';
 import { jobsApi } from '@/lib/jobs-api';
 import { sitesApi } from '@/lib/sites-api';
 import { workersApi } from '@/lib/workers-api';
-import type { Job, JobFilters, Site, Skill, CreateJobPayload } from '@/types/jobs';
-import { useAuthStore } from '@/store/auth.store';
+import type { Job, Site, Skill, CreateJobPayload } from '@/types/jobs';
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 function StatusBadge({ status }: { status: Job['status'] }) {
