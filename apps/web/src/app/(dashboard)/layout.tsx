@@ -490,13 +490,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const mainBg = theme.dark ? 'bg-slate-950' : 'bg-slate-50';
 
   return (
-    <div className={`min-h-screen ${mainBg} flex`}>
+    // h-screen + overflow-hidden pins the container to the viewport.
+    // This gives the sidebar's h-full a concrete value to inherit (= 100vh),
+    // eliminating the empty white box at the bottom.
+    // Only <main> scrolls — the sidebar and topbar stay fixed in view.
+    <div className={`h-screen overflow-hidden ${mainBg} flex`}>
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Topbar onMenuClick={() => setSidebarOpen(true)} />
 
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-y-auto">
           {children}
         </main>
       </div>
