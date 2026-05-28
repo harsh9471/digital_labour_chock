@@ -1,0 +1,890 @@
+// ============================================================
+// Digital Labour Chowk - Complete Database Schema
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum UserRole {
+  WORKER
+  CONTRACTOR
+  COMPANY_ADMIN
+  SUPER_ADMIN
+
+  @@map("user_role")
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+  BANNED
+
+  @@map("user_status")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+
+  @@map("gender")
+}
+
+enum DocumentType {
+  AADHAR
+  PAN
+  DRIVING_LICENSE
+  PASSPORT
+  VOTER_ID
+  WORK_PERMIT
+  SKILL_CERTIFICATE
+  EDUCATION_CERTIFICATE
+  OTHER
+
+  @@map("document_type")
+}
+
+enum DocumentStatus {
+  PENDING
+  UNDER_REVIEW
+  VERIFIED
+  REJECTED
+  EXPIRED
+
+  @@map("document_status")
+}
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+
+  @@map("skill_level")
+}
+
+enum OtpPurpose {
+  LOGIN
+  REGISTER
+  PASSWORD_RESET
+  EMAIL_VERIFY
+  PHONE_VERIFY
+
+  @@map("otp_purpose")
+}
+
+enum JobStatus {
+  DRAFT
+  PUBLISHED
+  ACTIVE
+  FILLED
+  COMPLETED
+  CLOSED
+  CANCELLED
+
+  @@map("job_status")
+}
+
+enum JobType {
+  DAILY
+  WEEKLY
+  MONTHLY
+  CONTRACT
+  FIXED_TERM
+
+  @@map("job_type")
+}
+
+enum ApplicationStatus {
+  SUBMITTED
+  VIEWED
+  SHORTLISTED
+  HIRED
+  REJECTED
+  WITHDRAWN
+
+  @@map("application_status")
+}
+
+enum AttendanceMethod {
+  GPS
+  QR
+  MANUAL
+
+  @@map("attendance_method")
+}
+
+enum PayrollStatus {
+  DRAFT
+  PENDING_APPROVAL
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+
+  @@map("payroll_status")
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  PAID
+  FAILED
+  REFUNDED
+
+  @@map("payment_status")
+}
+
+// ============================================================
+// CORE USER MODELS
+// ============================================================
+
+model User {
+  id            String     @id @default(cuid())
+  email         String?    @unique
+  phone         String?    @unique
+  passwordHash  String?
+  firstName     String
+  lastName      String
+  role          UserRole
+  status        UserStatus @default(PENDING_VERIFICATION)
+  avatar        String?
+  emailVerified Boolean    @default(false)
+  phoneVerified Boolean    @default(false)
+  lastLoginAt   DateTime?
+  loginCount    Int        @default(0)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  deletedAt     DateTime?
+
+  worker       Worker?
+  contractor   Contractor?
+  companyAdmin CompanyAdmin?
+  admin        Admin?
+  sessions     UserSession[]
+  documents    Document[]
+  otpCodes     OtpCode[]
+
+  @@index([email])
+  @@index([phone])
+  @@index([role])
+  @@index([status])
+  @@index([deletedAt])
+  @@map("users")
+}
+
+model Worker {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  bio               String?
+  dateOfBirth       DateTime?
+  gender            Gender?
+  languages         String[]
+  availableForWork  Boolean   @default(true)
+  hourlyRate        Decimal?  @db.Decimal(10, 2)
+  dailyRate         Decimal?  @db.Decimal(10, 2)
+  weeklyRate        Decimal?  @db.Decimal(10, 2)
+  experienceYears   Int       @default(0)
+  locationId        String?
+  city              String?
+  state             String?
+  pincode           String?
+  aadhaarLastFour   String?
+  panNumber         String?
+  upiId             String?
+  bankAccountNumber String?
+  bankIfsc          String?
+  fcmToken          String?
+  rating            Decimal?  @db.Decimal(3, 2)
+  totalRatings      Int       @default(0)
+  totalJobsDone     Int       @default(0)
+  isProfileComplete Boolean   @default(false)
+  profileViews      Int       @default(0)
+  kycStatus         String    @default("PENDING")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
+
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  location          Location?         @relation(fields: [locationId], references: [id])
+  skills            WorkerSkill[]
+  experiences       WorkerExperience[]
+  ratings           WorkerRating[]
+  savedJobs         SavedJob[]
+  applications      JobApplication[]
+  hireRecords       HireRecord[]
+  attendanceRecords AttendanceRecord[]
+  payrollRecords    PayrollRecord[]
+
+  @@index([userId])
+  @@index([locationId])
+  @@index([availableForWork])
+  @@index([rating])
+  @@index([city])
+  @@index([kycStatus])
+  @@index([deletedAt])
+  @@map("workers")
+}
+
+model Contractor {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  companyId         String?
+  bio               String?
+  specializations   String[]
+  licenseNumber     String?
+  licenseExpiry     DateTime?
+  gstin             String?   @unique
+  rating            Decimal?  @db.Decimal(3, 2)
+  totalRatings      Int       @default(0)
+  totalProjectsDone Int       @default(0)
+  locationId        String?
+  city              String?
+  state             String?
+  isVerified        Boolean   @default(false)
+  verifiedAt        DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
+
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company        Company?       @relation(fields: [companyId], references: [id])
+  location       Location?      @relation(fields: [locationId], references: [id])
+  sites          Site[]
+  jobs           Job[]
+  hireRecords    HireRecord[]
+  payrollBatches PayrollBatch[]
+  qrCodes        QrCode[]
+  workerRatings  WorkerRating[]
+
+  @@index([userId])
+  @@index([companyId])
+  @@index([locationId])
+  @@index([deletedAt])
+  @@map("contractors")
+}
+
+model Company {
+  id              String    @id @default(cuid())
+  name            String
+  slug            String    @unique
+  registrationNo  String?   @unique
+  gstNumber       String?   @unique
+  panNumber       String?   @unique
+  email           String?
+  phone           String?
+  website         String?
+  description     String?
+  logoUrl         String?
+  coverUrl        String?
+  isVerified      Boolean   @default(false)
+  verifiedAt      DateTime?
+  employeeCount   Int?
+  establishedYear Int?
+  locationId      String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  location    Location?      @relation(fields: [locationId], references: [id])
+  contractors Contractor[]
+  admins      CompanyAdmin[]
+
+  @@index([name])
+  @@index([slug])
+  @@index([isVerified])
+  @@index([deletedAt])
+  @@map("companies")
+}
+
+model CompanyAdmin {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  companyId String
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@map("company_admins")
+}
+
+model Admin {
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  isSuperAdmin Boolean   @default(false)
+  department   String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permissions AdminPermission[]
+
+  @@map("admins")
+}
+
+// ============================================================
+// RBAC - ROLES & PERMISSIONS
+// ============================================================
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  displayName String
+  description String?
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  permissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  resource    String
+  action      String
+  description String?
+  createdAt   DateTime @default(now())
+
+  roles  RolePermission[]
+  admins AdminPermission[]
+
+  @@index([resource])
+  @@map("permissions")
+}
+
+model RolePermission {
+  id           String   @id @default(cuid())
+  roleId       String
+  permissionId String
+  createdAt    DateTime @default(now())
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model AdminPermission {
+  id           String   @id @default(cuid())
+  adminId      String
+  permissionId String
+  createdAt    DateTime @default(now())
+
+  admin      Admin      @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([adminId, permissionId])
+  @@map("admin_permissions")
+}
+
+// ============================================================
+// SESSIONS
+// ============================================================
+
+model UserSession {
+  id           String   @id @default(cuid())
+  userId       String
+  refreshToken String   @unique
+  deviceInfo   String?
+  deviceId     String?
+  ipAddress    String?
+  userAgent    String?
+  isActive     Boolean  @default(true)
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([refreshToken])
+  @@index([isActive])
+  @@index([expiresAt])
+  @@map("user_sessions")
+}
+
+// ============================================================
+// DOCUMENTS
+// ============================================================
+
+model Document {
+  id              String         @id @default(cuid())
+  userId          String
+  type            DocumentType
+  documentNumber  String?
+  fileUrl         String
+  thumbnailUrl    String?
+  status          DocumentStatus @default(PENDING)
+  verifiedAt      DateTime?
+  verifiedBy      String?
+  rejectionReason String?
+  expiryDate      DateTime?
+  notes           String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  deletedAt       DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@index([deletedAt])
+  @@map("documents")
+}
+
+// ============================================================
+// LOCATIONS
+// ============================================================
+
+model Location {
+  id        String   @id @default(cuid())
+  address   String?
+  landmark  String?
+  area      String?
+  city      String
+  district  String?
+  state     String
+  country   String   @default("India")
+  pincode   String?
+  latitude  Decimal? @db.Decimal(10, 8)
+  longitude Decimal? @db.Decimal(11, 8)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workers     Worker[]
+  contractors Contractor[]
+  companies   Company[]
+
+  @@index([city])
+  @@index([state])
+  @@index([pincode])
+  @@map("locations")
+}
+
+// ============================================================
+// SKILLS
+// ============================================================
+
+model Skill {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  category    String
+  description String?
+  icon        String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workers WorkerSkill[]
+  jobs    Job[]
+
+  @@index([category])
+  @@index([isActive])
+  @@map("skills")
+}
+
+model WorkerSkill {
+  id                String     @id @default(cuid())
+  workerId          String
+  skillId           String
+  level             SkillLevel @default(BEGINNER)
+  yearsOfExperience Int        @default(0)
+  isVerified        Boolean    @default(false)
+  createdAt         DateTime   @default(now())
+
+  worker Worker @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  skill  Skill  @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([workerId, skillId])
+  @@map("worker_skills")
+}
+
+model WorkerExperience {
+  id           String    @id @default(cuid())
+  workerId     String
+  title        String
+  company      String
+  city         String?
+  description  String?
+  startDate    DateTime
+  endDate      DateTime?
+  isCurrent    Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  worker Worker @relation(fields: [workerId], references: [id], onDelete: Cascade)
+
+  @@index([workerId])
+  @@map("worker_experiences")
+}
+
+model WorkerRating {
+  id           String   @id @default(cuid())
+  workerId     String
+  contractorId String
+  jobId        String
+  rating       Decimal  @db.Decimal(3, 2)
+  review       String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  worker     Worker     @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  contractor Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+
+  @@unique([workerId, jobId])
+  @@index([workerId])
+  @@index([contractorId])
+  @@map("worker_ratings")
+}
+
+model SavedJob {
+  id        String   @id @default(cuid())
+  workerId  String
+  jobId     String
+  createdAt DateTime @default(now())
+
+  worker Worker @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  job    Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([workerId, jobId])
+  @@index([workerId])
+  @@map("saved_jobs")
+}
+
+// ============================================================
+// OTP
+// ============================================================
+
+model OtpCode {
+  id         String     @id @default(cuid())
+  userId     String?
+  identifier String
+  code       String
+  purpose    OtpPurpose
+  isUsed     Boolean    @default(false)
+  attempts   Int        @default(0)
+  expiresAt  DateTime
+  createdAt  DateTime   @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([identifier])
+  @@index([purpose])
+  @@index([expiresAt])
+  @@map("otp_codes")
+}
+
+// ============================================================
+// SITES (Construction Sites)
+// ============================================================
+
+model Site {
+  id            String    @id @default(cuid())
+  contractorId  String
+  name          String
+  description   String?
+  address       String
+  city          String
+  state         String
+  pincode       String?
+  latitude      Decimal?  @db.Decimal(10, 8)
+  longitude     Decimal?  @db.Decimal(11, 8)
+  radiusMeters  Int       @default(200)
+  isActive      Boolean   @default(true)
+  totalWorkers  Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  contractor        Contractor         @relation(fields: [contractorId], references: [id])
+  jobs              Job[]
+  attendanceRecords AttendanceRecord[]
+  qrCodes           QrCode[]
+
+  @@index([contractorId])
+  @@index([city])
+  @@index([isActive])
+  @@index([deletedAt])
+  @@map("sites")
+}
+
+// ============================================================
+// JOBS
+// ============================================================
+
+model Job {
+  id              String    @id @default(cuid())
+  contractorId    String
+  siteId          String?
+  title           String
+  description     String?
+  requiredSkillId String?
+  skillCategory   String?
+  workerCount     Int       @default(1)
+  filledCount     Int       @default(0)
+  dailyWage       Decimal?  @db.Decimal(10, 2)
+  weeklyWage      Decimal?  @db.Decimal(10, 2)
+  jobType         JobType   @default(DAILY)
+  status          JobStatus @default(DRAFT)
+  startDate       DateTime?
+  endDate         DateTime?
+  city            String
+  state           String
+  latitude        Decimal?  @db.Decimal(10, 8)
+  longitude       Decimal?  @db.Decimal(11, 8)
+  isUrgent        Boolean   @default(false)
+  viewCount       Int       @default(0)
+  publishedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  contractor        Contractor         @relation(fields: [contractorId], references: [id])
+  site              Site?              @relation(fields: [siteId], references: [id])
+  requiredSkill     Skill?             @relation(fields: [requiredSkillId], references: [id])
+  applications      JobApplication[]
+  hireRecords       HireRecord[]
+  attendanceRecords AttendanceRecord[]
+  payrollRecords    PayrollRecord[]
+  savedByWorkers    SavedJob[]
+
+  @@index([contractorId])
+  @@index([siteId])
+  @@index([status])
+  @@index([city])
+  @@index([jobType])
+  @@index([startDate])
+  @@index([requiredSkillId])
+  @@index([deletedAt])
+  @@map("jobs")
+}
+
+model JobApplication {
+  id             String            @id @default(cuid())
+  jobId          String
+  workerId       String
+  status         ApplicationStatus @default(SUBMITTED)
+  coverNote      String?
+  contractorNote String?
+  appliedAt      DateTime          @default(now())
+  viewedAt       DateTime?
+  shortlistedAt  DateTime?
+  hiredAt        DateTime?
+  rejectedAt     DateTime?
+  withdrawnAt    DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  job        Job         @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  worker     Worker      @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  hireRecord HireRecord?
+
+  @@unique([jobId, workerId])
+  @@index([jobId])
+  @@index([workerId])
+  @@index([status])
+  @@map("job_applications")
+}
+
+model HireRecord {
+  id                String    @id @default(cuid())
+  applicationId     String    @unique
+  jobId             String
+  workerId          String
+  contractorId      String
+  siteId            String?
+  agreedDailyWage   Decimal   @db.Decimal(10, 2)
+  startDate         DateTime
+  endDate           DateTime?
+  isActive          Boolean   @default(true)
+  terminatedAt      DateTime?
+  terminationReason String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  application JobApplication @relation(fields: [applicationId], references: [id])
+  job         Job             @relation(fields: [jobId], references: [id])
+  worker      Worker          @relation(fields: [workerId], references: [id])
+  contractor  Contractor      @relation(fields: [contractorId], references: [id])
+
+  @@index([jobId])
+  @@index([workerId])
+  @@index([contractorId])
+  @@index([isActive])
+  @@map("hire_records")
+}
+
+// ============================================================
+// ATTENDANCE
+// ============================================================
+
+model AttendanceRecord {
+  id            String           @id @default(cuid())
+  workerId      String
+  jobId         String
+  siteId        String
+  contractorId  String
+  checkInTime   DateTime
+  checkOutTime  DateTime?
+  checkInLat    Decimal?         @db.Decimal(10, 8)
+  checkInLon    Decimal?         @db.Decimal(11, 8)
+  checkOutLat   Decimal?         @db.Decimal(10, 8)
+  checkOutLon   Decimal?         @db.Decimal(11, 8)
+  geoFenceValid Boolean          @default(true)
+  method        AttendanceMethod @default(GPS)
+  totalHours    Decimal?         @db.Decimal(5, 2)
+  isFlagged     Boolean          @default(false)
+  flagReason    String?
+  notes         String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  worker Worker @relation(fields: [workerId], references: [id])
+  job    Job    @relation(fields: [jobId], references: [id])
+  site   Site   @relation(fields: [siteId], references: [id])
+
+  @@index([workerId])
+  @@index([jobId])
+  @@index([siteId])
+  @@index([contractorId])
+  @@index([checkInTime])
+  @@map("attendance_records")
+}
+
+model QrCode {
+  id           String    @id @default(cuid())
+  siteId       String
+  contractorId String
+  code         String    @unique @default(cuid())
+  isActive     Boolean   @default(true)
+  expiresAt    DateTime
+  scansCount   Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  site       Site       @relation(fields: [siteId], references: [id])
+  contractor Contractor @relation(fields: [contractorId], references: [id])
+
+  @@index([siteId])
+  @@index([code])
+  @@index([isActive])
+  @@map("qr_codes")
+}
+
+// ============================================================
+// PAYROLL
+// ============================================================
+
+model PayrollBatch {
+  id           String        @id @default(cuid())
+  contractorId String
+  jobId        String?
+  periodStart  DateTime
+  periodEnd    DateTime
+  status       PayrollStatus @default(DRAFT)
+  totalWorkers Int           @default(0)
+  totalAmount  Decimal?      @db.Decimal(12, 2)
+  processedAt  DateTime?
+  approvedAt   DateTime?
+  approvedBy   String?
+  notes        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  contractor Contractor      @relation(fields: [contractorId], references: [id])
+  records    PayrollRecord[]
+
+  @@index([contractorId])
+  @@index([status])
+  @@index([periodStart])
+  @@map("payroll_batches")
+}
+
+model PayrollRecord {
+  id              String        @id @default(cuid())
+  batchId         String
+  workerId        String
+  jobId           String
+  workingDays     Int           @default(0)
+  totalHours      Decimal?      @db.Decimal(7, 2)
+  regularHours    Decimal?      @db.Decimal(7, 2)
+  overtimeHours   Decimal?      @db.Decimal(7, 2)
+  dailyWage       Decimal       @db.Decimal(10, 2)
+  grossAmount     Decimal       @db.Decimal(12, 2)
+  pfDeduction     Decimal       @default(0) @db.Decimal(10, 2)
+  esiDeduction    Decimal       @default(0) @db.Decimal(10, 2)
+  otherDeductions Decimal       @default(0) @db.Decimal(10, 2)
+  netAmount       Decimal       @db.Decimal(12, 2)
+  paymentStatus   PaymentStatus @default(PENDING)
+  payslipUrl      String?
+  utrNumber       String?
+  paidAt          DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  batch  PayrollBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  worker Worker       @relation(fields: [workerId], references: [id])
+  job    Job          @relation(fields: [jobId], references: [id])
+
+  @@index([batchId])
+  @@index([workerId])
+  @@index([jobId])
+  @@index([paymentStatus])
+  @@map("payroll_records")
+}
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+
+enum NotificationType {
+  JOB_APPLICATION
+  APPLICATION_UPDATE
+  ATTENDANCE_CHECKIN
+  PAYROLL_PROCESSED
+  KYC_UPDATE
+  GENERAL
+
+  @@map("notification_type")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  title     String
+  body      String
+  type      NotificationType @default(GENERAL)
+  isRead    Boolean          @default(false)
+  data      Json?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([type])
+  @@map("notifications")
+}

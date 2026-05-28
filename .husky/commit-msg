@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Validate commit message format
+# Pattern: type(scope): description
+# Example: feat(auth): add OTP login support
+commit_msg=$(cat "$1")
+pattern="^(feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)(\(.+\))?: .{1,72}$"
+
+if ! echo "$commit_msg" | grep -qE "$pattern"; then
+  echo ""
+  echo "❌ Invalid commit message format!"
+  echo ""
+  echo "Expected format: <type>(<scope>): <description>"
+  echo "Example: feat(auth): add OTP login support"
+  echo ""
+  echo "Types: feat | fix | docs | style | refactor | perf | test | chore | ci | build | revert"
+  echo ""
+  exit 1
+fi
+
+echo "✅ Commit message format is valid"
