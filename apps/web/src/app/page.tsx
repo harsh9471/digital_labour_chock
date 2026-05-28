@@ -3,6 +3,7 @@ import { ArrowRight, CheckCircle2, Star, Users, Briefcase, MapPin, Shield, Zap }
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import NavActions from '@/components/home/NavActions';
 
 const stats = [
   { label: 'Registered Workers', value: '2L+', icon: Users },
@@ -46,14 +47,7 @@ export default function HomePage() {
             <Link href="#skills" className="text-sm text-gray-600 hover:text-gray-900 font-medium">Browse Skills</Link>
             <Link href="#about" className="text-sm text-gray-600 hover:text-gray-900 font-medium">About</Link>
           </div>
-          <div className="flex items-center gap-3">
-            <Link href="/login">
-              <Button variant="ghost" size="sm" className="hidden sm:flex">Sign In</Button>
-            </Link>
-            <Link href="/register">
-              <Button variant="brand" size="sm">Get Started</Button>
-            </Link>
-          </div>
+          <NavActions />
         </div>
       </nav>
 

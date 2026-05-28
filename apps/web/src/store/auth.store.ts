@@ -7,14 +7,16 @@ import type { AuthState, AuthTokens, LoginFormData, LoginResponse, OtpFormData, 
 // Lightweight session cookie so middleware knows a session exists
 // (actual JWT lives in localStorage — not accessible to middleware)
 const sessionCookie = {
-  set: () => {
+  set: (role: string) => {
     if (typeof document === 'undefined') return;
     const maxAge = 7 * 24 * 60 * 60; // 7 days — matches refresh token lifetime
     document.cookie = `dlc_session=1; path=/; max-age=${maxAge}; SameSite=Lax`;
+    document.cookie = `dlc_role=${role}; path=/; max-age=${maxAge}; SameSite=Lax`;
   },
   clear: () => {
     if (typeof document === 'undefined') return;
     document.cookie = 'dlc_session=; path=/; max-age=0; SameSite=Lax';
+    document.cookie = 'dlc_role=; path=/; max-age=0; SameSite=Lax';
   },
 };
 
@@ -50,7 +52,7 @@ export const useAuthStore = create<AuthStore>()(
           const response = await api.post<{ success: boolean; data: LoginResponse }>('/auth/login/email', data);
           const { user, tokens } = response.data;
           tokenStorage.setTokens(tokens.accessToken, tokens.refreshToken);
-          sessionCookie.set();
+          sessionCookie.set(user.role);
           set({ user, tokens, isAuthenticated: true, isLoading: false });
           return response.data;
         } catch (error) {
@@ -70,7 +72,7 @@ export const useAuthStore = create<AuthStore>()(
           const response = await api.post<{ success: boolean; data: LoginResponse }>('/auth/otp/verify', data);
           const { user, tokens } = response.data;
           tokenStorage.setTokens(tokens.accessToken, tokens.refreshToken);
-          sessionCookie.set();
+          sessionCookie.set(user.role);
           set({ user, tokens, isAuthenticated: true, isLoading: false });
           return response.data;
         } catch (error) {
@@ -115,7 +117,8 @@ export const useAuthStore = create<AuthStore>()(
           const response = await api.post<{ success: boolean; data: AuthTokens }>('/auth/refresh', { refreshToken });
           const tokens = response.data;
           tokenStorage.setTokens(tokens.accessToken, tokens.refreshToken);
-          sessionCookie.set();
+          const currentRole = get().user?.role ?? '';
+          sessionCookie.set(currentRole);
           set({ tokens, isAuthenticated: true });
         } catch {
           tokenStorage.clearTokens();
