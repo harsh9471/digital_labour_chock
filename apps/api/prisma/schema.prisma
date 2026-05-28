@@ -218,16 +218,17 @@ model Worker {
   updatedAt         DateTime  @updatedAt
   deletedAt         DateTime?
 
-  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  location          Location?         @relation(fields: [locationId], references: [id])
-  skills            WorkerSkill[]
-  experiences       WorkerExperience[]
-  ratings           WorkerRating[]
-  savedJobs         SavedJob[]
-  applications      JobApplication[]
-  hireRecords       HireRecord[]
-  attendanceRecords AttendanceRecord[]
-  payrollRecords    PayrollRecord[]
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  location             Location?             @relation(fields: [locationId], references: [id])
+  skills               WorkerSkill[]
+  experiences          WorkerExperience[]
+  ratings              WorkerRating[]
+  savedJobs            SavedJob[]
+  applications         JobApplication[]
+  hireRecords          HireRecord[]
+  attendanceRecords    AttendanceRecord[]
+  payrollRecords       PayrollRecord[]
+  workforceAssignments WorkforceAssignment[]
 
   @@index([userId])
   @@index([locationId])
@@ -260,15 +261,18 @@ model Contractor {
   updatedAt         DateTime  @updatedAt
   deletedAt         DateTime?
 
-  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  company        Company?       @relation(fields: [companyId], references: [id])
-  location       Location?      @relation(fields: [locationId], references: [id])
-  sites          Site[]
-  jobs           Job[]
-  hireRecords    HireRecord[]
-  payrollBatches PayrollBatch[]
-  qrCodes        QrCode[]
-  workerRatings  WorkerRating[]
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company              Company?              @relation(fields: [companyId], references: [id])
+  location             Location?             @relation(fields: [locationId], references: [id])
+  sites                Site[]
+  jobs                 Job[]
+  hireRecords          HireRecord[]
+  payrollBatches       PayrollBatch[]
+  qrCodes              QrCode[]
+  workerRatings        WorkerRating[]
+  projects             Project[]
+  workforceAssignments WorkforceAssignment[]
+  complianceRecords    ComplianceRecord[]
 
   @@index([userId])
   @@index([companyId])
@@ -302,6 +306,7 @@ model Company {
   location    Location?      @relation(fields: [locationId], references: [id])
   contractors Contractor[]
   admins      CompanyAdmin[]
+  projects    Project[]
 
   @@index([name])
   @@index([slug])
@@ -623,6 +628,7 @@ model Site {
   jobs              Job[]
   attendanceRecords AttendanceRecord[]
   qrCodes           QrCode[]
+  projectSites      ProjectSite[]
 
   @@index([contractorId])
   @@index([city])
@@ -887,4 +893,220 @@ model Notification {
   @@index([isRead])
   @@index([type])
   @@map("notifications")
+}
+
+// ============================================================
+// PROJECTS
+// ============================================================
+
+enum ProjectStatus {
+  PLANNING
+  ACTIVE
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+
+  @@map("project_status")
+}
+
+model Project {
+  id           String        @id @default(cuid())
+  companyId    String?
+  contractorId String
+  name         String
+  description  String?
+  code         String?       @unique
+  status       ProjectStatus @default(ACTIVE)
+  budget       Decimal?      @db.Decimal(14, 2)
+  startDate    DateTime?
+  endDate      DateTime?
+  city         String
+  state        String
+  address      String?
+  latitude     Decimal?      @db.Decimal(10, 8)
+  longitude    Decimal?      @db.Decimal(11, 8)
+  totalWorkers Int           @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
+
+  contractor           Contractor             @relation(fields: [contractorId], references: [id])
+  company              Company?               @relation(fields: [companyId], references: [id])
+  sites                ProjectSite[]
+  workforceAssignments WorkforceAssignment[]
+  complianceRecords    ComplianceRecord[]
+  reports              ProjectReport[]
+
+  @@index([contractorId])
+  @@index([companyId])
+  @@index([status])
+  @@index([city])
+  @@index([deletedAt])
+  @@map("projects")
+}
+
+model ProjectSite {
+  id        String   @id @default(cuid())
+  projectId String
+  siteId    String
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  site    Site    @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, siteId])
+  @@map("project_sites")
+}
+
+// ============================================================
+// WORKFORCE ASSIGNMENTS
+// ============================================================
+
+model WorkforceAssignment {
+  id           String    @id @default(cuid())
+  projectId    String
+  siteId       String?
+  workerId     String
+  contractorId String
+  jobId        String?
+  role         String?
+  startDate    DateTime
+  endDate      DateTime?
+  isActive     Boolean   @default(true)
+  dailyRate    Decimal?  @db.Decimal(10, 2)
+  notes        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  project    Project    @relation(fields: [projectId], references: [id])
+  worker     Worker     @relation(fields: [workerId], references: [id])
+  contractor Contractor @relation(fields: [contractorId], references: [id])
+
+  @@index([projectId])
+  @@index([workerId])
+  @@index([contractorId])
+  @@index([siteId])
+  @@index([isActive])
+  @@map("workforce_assignments")
+}
+
+// ============================================================
+// COMPLIANCE
+// ============================================================
+
+enum ComplianceType {
+  LABOR_LICENSE
+  GST_FILING
+  PF_REGISTRATION
+  ESI_REGISTRATION
+  SAFETY_AUDIT
+  SITE_INSPECTION
+  FIRE_NOC
+  BUILDING_PERMIT
+  OTHER
+
+  @@map("compliance_type")
+}
+
+enum ComplianceStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+  WAIVED
+
+  @@map("compliance_status")
+}
+
+model ComplianceRecord {
+  id           String           @id @default(cuid())
+  projectId    String?
+  contractorId String
+  companyId    String?
+  type         ComplianceType
+  title        String
+  description  String?
+  status       ComplianceStatus @default(PENDING)
+  dueDate      DateTime?
+  completedAt  DateTime?
+  fileUrl      String?
+  notes        String?
+  issuedBy     String?
+  referenceNo  String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  deletedAt    DateTime?
+
+  project    Project?   @relation(fields: [projectId], references: [id])
+  contractor Contractor @relation(fields: [contractorId], references: [id])
+
+  @@index([contractorId])
+  @@index([companyId])
+  @@index([projectId])
+  @@index([status])
+  @@index([type])
+  @@index([dueDate])
+  @@index([deletedAt])
+  @@map("compliance_records")
+}
+
+// ============================================================
+// PROJECT REPORTS
+// ============================================================
+
+enum ReportType {
+  ATTENDANCE_SUMMARY
+  PAYROLL_REGISTER
+  WORKER_PERFORMANCE
+  COMPLIANCE_SUMMARY
+  SITE_PRODUCTIVITY
+  CUSTOM
+
+  @@map("report_type")
+}
+
+model ProjectReport {
+  id           String     @id @default(cuid())
+  projectId    String
+  contractorId String
+  title        String
+  type         ReportType
+  fileUrl      String?
+  data         Json?
+  periodStart  DateTime?
+  periodEnd    DateTime?
+  createdBy    String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+  @@index([contractorId])
+  @@index([type])
+  @@map("project_reports")
+}
+
+// ============================================================
+// AUDIT LOGS
+// ============================================================
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  userId       String?
+  userRole     String?
+  action       String
+  resourceType String
+  resourceId   String?
+  before       Json?
+  after        Json?
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([resourceType])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
 }

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   User, MapPin, Star, Briefcase, Phone, Mail, Calendar,
-  Plus, Trash2, Edit2, CheckCircle, Clock, X, Save, ToggleLeft,
+  Plus, Trash2, Edit2, CheckCircle, Clock, X, Save,
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';

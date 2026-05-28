@@ -1,13 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useParams } from 'next/navigation';
 import {
   ArrowLeft, MapPin, Users, Clock, Briefcase, CheckCircle,
   XCircle, Eye, AlertCircle, Loader2, User, Star,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
 import { Select } from '@/components/ui/select';
 import { jobsApi } from '@/lib/jobs-api';
 import type { Job, JobApplication, ApplicationStatus } from '@/types/jobs';
@@ -21,7 +20,8 @@ const statusStyles: Record<ApplicationStatus, { label: string; className: string
   WITHDRAWN: { label: 'Withdrawn', className: 'bg-slate-200 text-slate-500' },
 };
 
-export default function JobDetailPage({ params }: { params: { id: string } }) {
+export default function JobDetailPage() {
+  const params = useParams<{ id: string }>();
   const [job, setJob] = useState<Job | null>(null);
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [appMeta, setAppMeta] = useState({ total: 0, page: 1, totalPages: 1 });
@@ -273,7 +273,7 @@ export default function JobDetailPage({ params }: { params: { id: string } }) {
                         )}
                       </div>
                       {app.coverNote && (
-                        <p className="text-xs text-slate-400 mt-1 truncate">"{app.coverNote}"</p>
+                        <p className="text-xs text-slate-400 mt-1 truncate">&ldquo;{app.coverNote}&rdquo;</p>
                       )}
                     </div>
                   </div>

@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import {
   Briefcase, Plus, Search, MapPin, Users, Zap, Eye,
-  ChevronRight, Pencil, X, CheckCircle, Clock,
+  ChevronRight, Pencil, X,
   Filter, ArrowUpRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

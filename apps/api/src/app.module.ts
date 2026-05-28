@@ -14,6 +14,12 @@ import { WorkersModule } from './workers/workers.module';
 import { ContractorsModule } from './contractors/contractors.module';
 import { SitesModule } from './sites/sites.module';
 import { JobsModule } from './jobs/jobs.module';
+import { ProjectsModule } from './projects/projects.module';
+import { AttendanceModule } from './attendance/attendance.module';
+import { PayrollModule } from './payroll/payroll.module';
+import { AnalyticsModule } from './analytics/analytics.module';
+import { ComplianceModule } from './compliance/compliance.module';
+import { CompanyModule } from './company/company.module';
 import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
@@ -47,6 +53,12 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
     ContractorsModule,
     SitesModule,
     JobsModule,
+    ProjectsModule,
+    AttendanceModule,
+    PayrollModule,
+    AnalyticsModule,
+    ComplianceModule,
+    CompanyModule,
   ],
   providers: [
     {

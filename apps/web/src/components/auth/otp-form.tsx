@@ -19,7 +19,7 @@ export function OtpForm({ initialPhone = '', purpose = 'LOGIN' }: OtpFormProps) 
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
-  const { sendOtp, loginWithOtp, isLoading } = useAuthStore();
+  const { sendOtp, loginWithOtp } = useAuthStore();
 
   const phone = searchParams.get('phone') || initialPhone;
   const otpPurpose = searchParams.get('purpose') || purpose;

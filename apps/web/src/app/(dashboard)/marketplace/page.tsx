@@ -3,18 +3,15 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import {
-  Search, MapPin, Filter, X, ChevronLeft, ChevronRight,
-  Briefcase, Clock, Zap, Star, Bookmark, BookmarkCheck,
-  SlidersHorizontal, Building2,
+  Search, MapPin, X, ChevronLeft, ChevronRight,
+  Briefcase, Clock, Zap, Bookmark, BookmarkCheck,
+  SlidersHorizontal,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useAuthStore } from '@/store/auth.store';
 import { jobsApi } from '@/lib/jobs-api';
 import { workersApi } from '@/lib/workers-api';
-import { formatCurrency, formatDate, debounce } from '@/lib/utils';
+import { formatCurrency, debounce } from '@/lib/utils';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Job = any;
@@ -216,9 +213,7 @@ function FiltersPanel({
 }
 
 export default function MarketplacePage() {
-  const { user } = useAuthStore();
   const { toast } = useToast();
-  const isWorker = user?.role === 'WORKER';
 
   const [jobs, setJobs] = useState<Job[]>([]);
   const [meta, setMeta] = useState({ total: 0, page: 1, totalPages: 1 });
