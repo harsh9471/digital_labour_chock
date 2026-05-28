@@ -484,7 +484,7 @@ function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
-  const { user, isAuthenticated } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -514,9 +514,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     );
   }
 
-  const role = user?.role ?? 'WORKER';
-  const theme = THEMES[role] ?? THEMES.WORKER;
-  const mainBg = theme.dark ? 'bg-slate-950' : 'bg-slate-50';
+  const mainBg = 'bg-slate-50';
 
   return (
     // h-screen + overflow-hidden pins the container to the viewport.

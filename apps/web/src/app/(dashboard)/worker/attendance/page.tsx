@@ -185,7 +185,7 @@ export default function WorkerAttendancePage() {
                       {record.checkOutTime ? new Date(record.checkOutTime).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '—'}
                     </td>
                     <td className="py-3 px-4 text-sm text-slate-600">
-                      {record.totalHours != null ? `${record.totalHours.toFixed(1)}h` : '—'}
+                      {record.totalHours != null ? `${Number(record.totalHours).toFixed(1)}h` : '—'}
                     </td>
                   </tr>
                 ))}

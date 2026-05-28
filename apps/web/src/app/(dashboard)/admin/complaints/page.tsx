@@ -71,10 +71,10 @@ export default function AdminComplaintsPage() {
   ];
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
+    <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Complaints</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Complaints</h1>
           <p className="text-sm text-slate-500 mt-0.5">Manage platform complaints and disputes</p>
         </div>
         <button onClick={fetchComplaints} className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 transition-colors">
@@ -130,7 +130,7 @@ export default function AdminComplaintsPage() {
           {complaints.map((complaint) => (
             <Card key={complaint.id} className={`border-0 shadow-sm ${complaint.status === 'OPEN' ? 'border-l-2 border-l-yellow-400' : ''}`}>
               <CardContent className="p-4">
-                <div className="flex items-start gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-start gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h3 className="font-semibold text-slate-900 text-sm">{complaint.title}</h3>
@@ -140,7 +140,7 @@ export default function AdminComplaintsPage() {
                       <Badge variant="secondary" className="text-xs">{TYPE_LABELS[complaint.type] ?? complaint.type}</Badge>
                     </div>
                     <p className="text-xs text-slate-500 mt-1 line-clamp-2">{complaint.description}</p>
-                    <div className="flex items-center gap-3 mt-2 text-xs text-slate-400">
+                    <div className="flex items-center gap-3 mt-2 text-xs text-slate-400 flex-wrap">
                       {complaint.reporter && (
                         <span>By: {complaint.reporter.firstName} {complaint.reporter.lastName} ({complaint.reporter.role})</span>
                       )}
@@ -152,12 +152,12 @@ export default function AdminComplaintsPage() {
                       </p>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-2 sm:shrink-0 flex-wrap">
                     {complaint.status === 'OPEN' && (
                       <button
                         onClick={() => handleUpdateStatus(complaint.id, 'UNDER_REVIEW')}
                         disabled={updating === complaint.id}
-                        className="px-2.5 py-1.5 text-xs border border-blue-200 text-blue-700 rounded-lg hover:bg-blue-50 transition-colors"
+                        className="flex-1 sm:flex-none px-2.5 py-1.5 text-xs border border-blue-200 text-blue-700 rounded-lg hover:bg-blue-50 transition-colors text-center"
                       >
                         Review
                       </button>
@@ -165,7 +165,7 @@ export default function AdminComplaintsPage() {
                     {(complaint.status === 'OPEN' || complaint.status === 'UNDER_REVIEW') && (
                       <button
                         onClick={() => { setSelectedComplaint(complaint); setResolution(''); }}
-                        className="px-2.5 py-1.5 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                        className="flex-1 sm:flex-none px-2.5 py-1.5 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-center"
                       >
                         Resolve
                       </button>
@@ -174,7 +174,7 @@ export default function AdminComplaintsPage() {
                       <button
                         onClick={() => handleUpdateStatus(complaint.id, 'DISMISSED')}
                         disabled={updating === complaint.id}
-                        className="px-2.5 py-1.5 text-xs border border-slate-200 text-slate-500 rounded-lg hover:bg-slate-50 transition-colors"
+                        className="flex-1 sm:flex-none px-2.5 py-1.5 text-xs border border-slate-200 text-slate-500 rounded-lg hover:bg-slate-50 transition-colors text-center"
                       >
                         Dismiss
                       </button>

@@ -188,7 +188,7 @@ function WorkerCard({ worker }: { worker: WorkerProfile }) {
           {worker.rating != null && (
             <div className="flex items-center gap-0.5 text-amber-500 shrink-0">
               <Star className="h-3.5 w-3.5 fill-current" />
-              <span className="text-xs font-semibold">{worker.rating.toFixed(1)}</span>
+              <span className="text-xs font-semibold">{Number(worker.rating).toFixed(1)}</span>
             </div>
           )}
         </div>
