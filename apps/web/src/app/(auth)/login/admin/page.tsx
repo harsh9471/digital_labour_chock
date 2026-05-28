@@ -26,29 +26,40 @@ const DEV_ADMINS = [
   { label: 'Admin',       email: 'admin@digitallabourchowk.com',      password: 'Password@123' },
 ];
 
+const ALLOWED_ROLES = ['SUPER_ADMIN', 'ADMIN', 'COMPANY_ADMIN'];
+
 export default function AdminLoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { login, isLoading } = useAuthStore();
   const [showPass, setShowPass] = useState(false);
   const [showDevPanel, setShowDevPanel] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema),
   });
 
+  const redirectWithError = (msg: string) => {
+    toast({ title: 'Login failed', description: msg, variant: 'destructive' });
+    setErrorMsg(msg);
+    setTimeout(() => router.push('/login'), 2000);
+  };
+
   const onSubmit = async (data: FormValues) => {
+    setErrorMsg(null);
     try {
       const response = await login(data);
-      if (!['SUPER_ADMIN', 'COMPANY_ADMIN'].includes(response.user.role)) {
-        toast({ title: 'Access Denied', description: 'Admin credentials required', variant: 'destructive' });
+      if (!ALLOWED_ROLES.includes(response.user.role)) {
+        redirectWithError('This portal is for administrators only. Redirecting…');
         return;
       }
       toast({ title: `Welcome, ${response.user.firstName}!` });
       router.push('/admin');
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
-      toast({ title: 'Login failed', description: axiosError.response?.data?.message || 'Invalid credentials', variant: 'destructive' });
+      const msg = axiosError.response?.data?.message || 'Invalid email or password. Please try again.';
+      redirectWithError(msg);
     }
   };
 
@@ -169,6 +180,14 @@ export default function AdminLoginPage() {
                   }
                   error={errors.password?.message} {...register('password')} />
               </div>
+
+              {errorMsg && (
+                <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 flex items-start gap-2">
+                  <span className="text-red-500 text-sm font-medium mt-0.5">✕</span>
+                  <p className="text-red-700 text-sm">{errorMsg}</p>
+                </div>
+              )}
+
               <Button type="submit" size="lg" className="w-full bg-purple-700 hover:bg-purple-800 text-white" loading={isLoading}>
                 {isLoading ? 'Signing in...' : 'Sign In to Admin Panel →'}
               </Button>
