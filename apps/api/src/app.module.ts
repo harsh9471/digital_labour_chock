@@ -20,6 +20,7 @@ import { PayrollModule } from './payroll/payroll.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { ComplianceModule } from './compliance/compliance.module';
 import { CompanyModule } from './company/company.module';
+import { ComplaintsModule } from './complaints/complaints.module';
 import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
@@ -59,6 +60,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
     AnalyticsModule,
     ComplianceModule,
     CompanyModule,
+    ComplaintsModule,
   ],
   providers: [
     {
