@@ -29,6 +29,14 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Get('admin/stats')
+  @Roles(UserRole.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Get platform-wide stats (Admin only)' })
+  async getAdminStats() {
+    const data = await this.usersService.getAdminStats();
+    return { success: true, data, message: 'Stats retrieved' };
+  }
+
   @Get()
   @Roles(UserRole.SUPER_ADMIN)
   @ApiOperation({ summary: 'Get all users (Admin only)' })

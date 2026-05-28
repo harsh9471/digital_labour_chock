@@ -227,6 +227,21 @@ export class WorkersController {
     return { success: true, ...result, message: 'Ratings retrieved' };
   }
 
+  // ─── Admin KYC ────────────────────────────────────────────────────────────
+
+  @Patch(':workerId/kyc')
+  @Roles('SUPER_ADMIN')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update worker KYC status (Admin only)' })
+  @ApiParam({ name: 'workerId' })
+  async updateKyc(
+    @Param('workerId') workerId: string,
+    @Body('kycStatus') kycStatus: string,
+  ) {
+    const data = await this.workersService.updateKycStatus(workerId, kycStatus);
+    return { success: true, data, message: 'KYC status updated' };
+  }
+
   // ─── Public Profile ───────────────────────────────────────────────────────
 
   @Get(':workerId')

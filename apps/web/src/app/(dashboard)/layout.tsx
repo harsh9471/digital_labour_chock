@@ -26,6 +26,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Browse Jobs',     href: '/marketplace',                 icon: Store,           roles: ['WORKER'],            section: 'jobs' },
   { label: 'My Applications', href: '/worker/applications',         icon: FileText,        roles: ['WORKER'],            section: 'jobs' },
   { label: 'Saved Jobs',      href: '/worker/saved',                icon: Bookmark,        roles: ['WORKER'],            section: 'jobs' },
+  { label: 'Attendance',      href: '/worker/attendance',           icon: CalendarCheck,   roles: ['WORKER'],            section: 'jobs' },
   { label: 'My Profile',      href: '/worker/profile',              icon: UserCircle,      roles: ['WORKER'],            section: 'account' },
 
   // Contractor
@@ -49,10 +50,11 @@ const NAV_ITEMS: NavItem[] = [
 
   // Super Admin
   { label: 'Dashboard',       href: '/admin',                       icon: LayoutDashboard, roles: ['SUPER_ADMIN'],       section: 'main' },
-  { label: 'Workers',         href: '/workers',                     icon: Users,           roles: ['SUPER_ADMIN'],       section: 'manage' },
+  { label: 'Workers',         href: '/admin/workers',               icon: Users,           roles: ['SUPER_ADMIN'],       section: 'manage' },
   { label: 'Contractors',     href: '/contractors',                 icon: Briefcase,       roles: ['SUPER_ADMIN'],       section: 'manage' },
   { label: 'Companies',       href: '/admin/companies',             icon: Building2,       roles: ['SUPER_ADMIN'],       section: 'manage' },
   { label: 'Verifications',   href: '/admin/kyc',                   icon: Shield,          roles: ['SUPER_ADMIN'],       section: 'manage' },
+  { label: 'Complaints',      href: '/admin/complaints',            icon: AlertCircle,     roles: ['SUPER_ADMIN'],       section: 'manage' },
   { label: 'Analytics',       href: '/admin/analytics',             icon: BarChart2,       roles: ['SUPER_ADMIN'],       section: 'manage' },
   { label: 'Settings',        href: '/admin/settings',              icon: Settings,        roles: ['SUPER_ADMIN'],       section: 'manage' },
 ];
@@ -393,11 +395,17 @@ function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
     if (pathname.startsWith('/company/workforce')) return 'Workforce';
     if (pathname.startsWith('/company/compliance')) return 'Compliance';
     if (pathname === '/admin') return 'Admin Dashboard';
+    if (pathname.startsWith('/admin/workers')) return 'Workers';
     if (pathname.startsWith('/admin/kyc')) return 'Verifications';
     if (pathname.startsWith('/admin/analytics')) return 'Analytics';
     if (pathname.startsWith('/admin/companies')) return 'Companies';
+    if (pathname.startsWith('/admin/complaints')) return 'Complaints';
+    if (pathname.startsWith('/admin/settings')) return 'Admin Settings';
     if (pathname === '/workers') return 'Workers';
     if (pathname === '/sites') return 'Sites';
+    if (pathname.startsWith('/worker/attendance')) return 'My Attendance';
+    if (pathname === '/settings') return 'Settings';
+    if (pathname === '/contractors') return 'Contractors';
     return 'Dashboard';
   })();
 

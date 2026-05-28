@@ -177,6 +177,7 @@ model User {
   sessions     UserSession[]
   documents    Document[]
   otpCodes     OtpCode[]
+  complaints   Complaint[]   @relation("reporter")
 
   @@index([email])
   @@index([phone])
@@ -1109,4 +1110,52 @@ model AuditLog {
   @@index([action])
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+// ============================================================
+// COMPLAINTS
+// ============================================================
+
+enum ComplaintType {
+  PAYMENT_DISPUTE
+  HARASSMENT
+  FRAUD
+  SAFETY_VIOLATION
+  CONTRACT_BREACH
+  OTHER
+
+  @@map("complaint_type")
+}
+
+enum ComplaintStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  DISMISSED
+
+  @@map("complaint_status")
+}
+
+model Complaint {
+  id             String          @id @default(cuid())
+  reportedBy     String
+  reportedAgainst String?
+  type           ComplaintType
+  status         ComplaintStatus @default(OPEN)
+  title          String
+  description    String          @db.Text
+  resolution     String?         @db.Text
+  resolvedBy     String?
+  resolvedAt     DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  reporter User @relation("reporter", fields: [reportedBy], references: [id])
+
+  @@index([reportedBy])
+  @@index([reportedAgainst])
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+  @@map("complaints")
 }

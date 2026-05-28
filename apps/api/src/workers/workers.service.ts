@@ -596,4 +596,14 @@ export class WorkersService {
 
     return !!(city && dailyRate && experienceYears != null && bio);
   }
+
+  async updateKycStatus(workerId: string, kycStatus: string) {
+    const worker = await this.prisma.worker.findUnique({ where: { id: workerId } });
+    if (!worker) throw new NotFoundException('Worker not found');
+    return this.prisma.worker.update({
+      where: { id: workerId },
+      data: { kycStatus },
+      select: { id: true, kycStatus: true, updatedAt: true },
+    });
+  }
 }

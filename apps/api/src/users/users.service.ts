@@ -235,4 +235,16 @@ export class UsersService {
       },
     };
   }
+
+  async getAdminStats() {
+    const [totalWorkers, totalContractors, totalCompanies, totalJobs, pendingKyc, pendingVerifications] = await Promise.all([
+      this.prisma.worker.count({ where: { deletedAt: null } }),
+      this.prisma.contractor.count({ where: { deletedAt: null } }),
+      this.prisma.company.count(),
+      this.prisma.job.count(),
+      this.prisma.worker.count({ where: { kycStatus: 'PENDING', deletedAt: null } }),
+      this.prisma.user.count({ where: { status: 'PENDING_VERIFICATION', deletedAt: null } }),
+    ]);
+    return { totalWorkers, totalContractors, totalCompanies, totalJobs, pendingKyc, pendingVerifications };
+  }
 }
