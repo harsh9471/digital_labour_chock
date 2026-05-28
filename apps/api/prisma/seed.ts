@@ -2,7 +2,8 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-const PASSWORD_HASH = '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewWe1RKzSVHjzP9K';
+// bcrypt hash of "Password@123" at cost 12
+const PASSWORD_HASH = '$2a$12$iV.RWTHPyOYKXagLsQyld.w1Sjogf4nnowSNpe/9yKJtwADq0lVla';
 
 const d = (offset: number) => {
   const dt = new Date();
