@@ -299,55 +299,82 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
           </div>
         )}
 
-        {/* ── Navigation ── */}
-        <nav className="flex-1 px-3 py-3 overflow-y-auto space-y-5">
-          {Object.entries(sections).map(([sectionKey, items]) => {
-            const deduped = items.filter(
-              (item, idx, arr) => arr.findIndex((i) => i.href === item.href) === idx,
-            );
-            return (
-              <div key={sectionKey}>
-                {SECTION_LABELS[sectionKey] && (
-                  <p className={`px-2 mb-1.5 text-[10px] font-bold uppercase tracking-widest ${theme.sectionLabel}`}>
-                    {SECTION_LABELS[sectionKey]}
-                  </p>
-                )}
-                <ul className="space-y-0.5">
-                  {deduped.map((item) => {
-                    const Icon = item.icon;
-                    const active = isActive(item.href);
-                    return (
-                      <li key={item.href}>
-                        <Link
-                          href={item.href}
-                          onClick={onClose}
-                          className={`
-                            group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
-                            transition-all duration-150
-                            ${theme.navBase} ${theme.navHover}
-                            ${active ? theme.navActive : ''}
-                          `}
-                        >
-                          {/* Active left indicator bar */}
-                          {active && (
-                            <span className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full ${theme.navActiveIndicator}`} />
-                          )}
-                          <Icon
-                            className={`h-4 w-4 shrink-0 transition-colors ${active ? theme.navActiveIcon : theme.navInactiveIcon}`}
-                          />
-                          <span className="flex-1 truncate">{item.label}</span>
-                          {active && (
-                            <ChevronRight className={`h-3.5 w-3.5 shrink-0 ${theme.navActiveIcon}`} />
-                          )}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            );
-          })}
-        </nav>
+        {/* ── Navigation — scrollable with fade indicators ── */}
+        <div className="flex-1 relative overflow-hidden flex flex-col min-h-0">
+
+          {/* Top fade — hides content disappearing under the header */}
+          <div className={`absolute top-0 inset-x-0 h-4 z-10 pointer-events-none
+            bg-gradient-to-b ${theme.dark ? 'from-slate-900' : 'from-white'} to-transparent`}
+          />
+
+          <nav
+            className={`
+              flex-1 px-3 py-3 overflow-y-auto space-y-2 scroll-smooth
+              [&::-webkit-scrollbar]:w-[3px]
+              [&::-webkit-scrollbar-track]:bg-transparent
+              [&::-webkit-scrollbar-thumb]:rounded-full
+              [&::-webkit-scrollbar-thumb]:transition-colors
+              ${theme.dark
+                ? '[&::-webkit-scrollbar-thumb]:bg-slate-600/50 hover:[&::-webkit-scrollbar-thumb]:bg-slate-400/70'
+                : '[&::-webkit-scrollbar-thumb]:bg-slate-300 hover:[&::-webkit-scrollbar-thumb]:bg-slate-400'
+              }
+            `}
+          >
+            {Object.entries(sections).map(([sectionKey, items]) => {
+              const deduped = items.filter(
+                (item, idx, arr) => arr.findIndex((i) => i.href === item.href) === idx,
+              );
+              return (
+                <div key={sectionKey}>
+                  {SECTION_LABELS[sectionKey] && (
+                    <div className="flex items-center gap-2 px-2 pt-1 pb-1">
+                      <p className={`text-[9px] font-bold uppercase tracking-[0.15em] ${theme.sectionLabel}`}>
+                        {SECTION_LABELS[sectionKey]}
+                      </p>
+                      <div className={`flex-1 h-px ${theme.dark ? 'bg-slate-700/50' : 'bg-slate-200/80'}`} />
+                    </div>
+                  )}
+                  <ul className="space-y-0.5">
+                    {deduped.map((item) => {
+                      const Icon = item.icon;
+                      const active = isActive(item.href);
+                      return (
+                        <li key={item.href}>
+                          <Link
+                            href={item.href}
+                            onClick={onClose}
+                            className={`
+                              group relative flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium
+                              transition-all duration-150
+                              ${theme.navBase} ${theme.navHover}
+                              ${active ? theme.navActive : ''}
+                            `}
+                          >
+                            {active && (
+                              <span className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r-full ${theme.navActiveIndicator}`} />
+                            )}
+                            <Icon className={`h-[15px] w-[15px] shrink-0 transition-colors ${active ? theme.navActiveIcon : theme.navInactiveIcon}`} />
+                            <span className="flex-1 truncate text-[13px]">{item.label}</span>
+                            {active && (
+                              <ChevronRight className={`h-3 w-3 shrink-0 ${theme.navActiveIcon}`} />
+                            )}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              );
+            })}
+            {/* Bottom padding so last item isn't hidden by fade */}
+            <div className="h-2" />
+          </nav>
+
+          {/* Bottom fade — signals more content below */}
+          <div className={`absolute bottom-0 inset-x-0 h-6 z-10 pointer-events-none
+            bg-gradient-to-t ${theme.dark ? 'from-slate-900' : 'from-white'} to-transparent`}
+          />
+        </div>
 
         {/* ── Bottom actions ── */}
         <div className={`px-3 py-3 border-t ${theme.bottomBorder} space-y-0.5`}>
