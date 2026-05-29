@@ -90,7 +90,7 @@ export default function SitesPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="min-h-screen bg-slate-100 p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

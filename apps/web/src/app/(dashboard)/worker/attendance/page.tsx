@@ -172,86 +172,79 @@ export default function WorkerAttendancePage() {
         </button>
       </div>
 
-      {/* ── Clock + status card ── */}
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-6 text-white shadow-xl">
-        <div className="flex flex-col sm:flex-row items-center gap-6">
-          {/* Live clock */}
+      {/* ── Unified clock + action card ── */}
+      <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 rounded-3xl p-5 sm:p-6 text-white shadow-2xl">
+        <div className="flex flex-col sm:flex-row items-center gap-5">
+
+          {/* Left: Live clock */}
           <div className="flex-1 text-center sm:text-left">
-            <p className="text-slate-400 text-sm font-medium tracking-wide uppercase mb-1">Current Time</p>
-            <p className="text-5xl sm:text-6xl font-bold font-mono tabular-nums tracking-tight">
-              {now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-            </p>
-            <p className="text-slate-400 mt-2 text-sm">
+            <p className="text-slate-400 text-xs font-semibold tracking-widest uppercase mb-1">
               {now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
             </p>
+            <p className="text-4xl sm:text-5xl font-bold font-mono tabular-nums tracking-tight">
+              {now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            </p>
           </div>
-          {/* Status pill */}
-          <div className="flex flex-col items-center gap-2">
+
+          {/* Right: status + compact action buttons */}
+          <div className="flex flex-col items-center sm:items-end gap-3 shrink-0">
+            {/* Status badge */}
             {isSignedIn ? (
-              <div className="flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/40 px-5 py-2.5 rounded-2xl">
-                <span className="relative flex h-3 w-3">
+              <div className="flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/30 px-4 py-1.5 rounded-full">
+                <span className="relative flex h-2.5 w-2.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
                 </span>
-                <span className="text-emerald-300 font-bold text-sm tracking-wide">SIGNED IN</span>
+                <span className="text-emerald-300 font-bold text-xs tracking-widest uppercase">Signed In</span>
+                {todayRecord?.checkInTime && (
+                  <span className="text-emerald-400/70 text-xs">· since {fmtTime(todayRecord.checkInTime)}</span>
+                )}
               </div>
             ) : (
-              <div className="flex items-center gap-2 bg-slate-700 border border-slate-600 px-5 py-2.5 rounded-2xl">
-                <span className="h-3 w-3 rounded-full bg-slate-500" />
-                <span className="text-slate-400 font-bold text-sm tracking-wide">NOT SIGNED IN</span>
+              <div className="flex items-center gap-2 bg-slate-700/60 border border-slate-600 px-4 py-1.5 rounded-full">
+                <span className="h-2.5 w-2.5 rounded-full bg-slate-500" />
+                <span className="text-slate-400 font-bold text-xs tracking-widest uppercase">Not Signed In</span>
               </div>
             )}
-            {isSignedIn && todayRecord?.checkInTime && (
-              <p className="text-slate-400 text-xs">
-                Since {fmtTime(todayRecord.checkInTime)}
-              </p>
-            )}
+
+            {/* Compact Sign In / Sign Out buttons side by side */}
+            <div className="flex gap-2.5">
+              <button
+                onClick={handleSignIn}
+                disabled={actionLoading || isSignedIn}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 shadow-md
+                  bg-gradient-to-r from-emerald-500 to-teal-600 text-white
+                  ${isSignedIn || actionLoading
+                    ? 'opacity-40 cursor-not-allowed'
+                    : 'hover:shadow-emerald-500/40 hover:shadow-lg hover:scale-105 active:scale-95'
+                  }`}
+              >
+                {actionLoading && !isSignedIn
+                  ? <Loader2 className="h-4 w-4 animate-spin" />
+                  : <LogIn className="h-4 w-4" />
+                }
+                Sign In
+              </button>
+
+              <button
+                onClick={handleSignOut}
+                disabled={actionLoading || !isSignedIn}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 shadow-md
+                  bg-gradient-to-r from-red-500 to-rose-600 text-white
+                  ${!isSignedIn || actionLoading
+                    ? 'opacity-40 cursor-not-allowed'
+                    : 'hover:shadow-red-500/40 hover:shadow-lg hover:scale-105 active:scale-95'
+                  }`}
+              >
+                {actionLoading && isSignedIn
+                  ? <Loader2 className="h-4 w-4 animate-spin" />
+                  : <LogOut className="h-4 w-4" />
+                }
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* ── Sign In / Sign Out buttons ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Sign In */}
-        <button
-          onClick={handleSignIn}
-          disabled={actionLoading || isSignedIn}
-          className={`relative group flex items-center justify-center gap-3 py-5 rounded-2xl text-white font-bold text-lg shadow-lg transition-all duration-200
-            bg-gradient-to-br from-emerald-500 to-teal-600
-            ${isSignedIn || actionLoading
-              ? 'opacity-50 cursor-not-allowed'
-              : 'hover:shadow-emerald-300/50 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]'
-            }`}
-        >
-          {actionLoading && !isSignedIn ? (
-            <Loader2 className="h-6 w-6 animate-spin" />
-          ) : (
-            <LogIn className="h-6 w-6" />
-          )}
-          Sign In
-          {!isSignedIn && (
-            <span className="absolute inset-0 rounded-2xl bg-white opacity-0 group-hover:opacity-5 transition-opacity" />
-          )}
-        </button>
-
-        {/* Sign Out */}
-        <button
-          onClick={handleSignOut}
-          disabled={actionLoading || !isSignedIn}
-          className={`relative group flex items-center justify-center gap-3 py-5 rounded-2xl text-white font-bold text-lg shadow-lg transition-all duration-200
-            bg-gradient-to-br from-red-500 to-rose-600
-            ${!isSignedIn || actionLoading
-              ? 'opacity-50 cursor-not-allowed'
-              : 'hover:shadow-red-300/50 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]'
-            }`}
-        >
-          {actionLoading && isSignedIn ? (
-            <Loader2 className="h-6 w-6 animate-spin" />
-          ) : (
-            <LogOut className="h-6 w-6" />
-          )}
-          Sign Out
-        </button>
       </div>
 
       {/* ── Today's summary ── */}

@@ -505,11 +505,11 @@ async function main() {
   // Link sites to projects
   await prisma.projectSite.createMany({
     data: [
-      { projectId: 'prj_01', siteId: 'site_01' },
-      { projectId: 'prj_02', siteId: 'site_02' },
-      { projectId: 'prj_03', siteId: 'site_03' },
-      { projectId: 'prj_04', siteId: 'site_04' },
-      { projectId: 'prj_05', siteId: 'site_05' },
+      { projectId: 'prj_01', siteId: 'ste_01' },
+      { projectId: 'prj_02', siteId: 'ste_02' },
+      { projectId: 'prj_03', siteId: 'ste_03' },
+      { projectId: 'prj_04', siteId: 'ste_04' },
+      { projectId: 'prj_05', siteId: 'ste_05' },
     ],
     skipDuplicates: true,
   });
@@ -518,15 +518,15 @@ async function main() {
   // ── DAY 3: Workforce Assignments ───────────────────────────────────
   await prisma.workforceAssignment.createMany({
     data: [
-      { id: 'wa_01', projectId: 'prj_01', workerId: 'wkr_01', contractorId: 'con_01', siteId: 'site_01', role: 'Lead Mason',       startDate: d(-85), dailyRate: 800,  isActive: true },
-      { id: 'wa_02', projectId: 'prj_01', workerId: 'wkr_15', contractorId: 'con_01', siteId: 'site_01', role: 'Mason',            startDate: d(-80), dailyRate: 750,  isActive: true },
-      { id: 'wa_03', projectId: 'prj_01', workerId: 'wkr_09', contractorId: 'con_01', siteId: 'site_01', role: 'Plumber',          startDate: d(-70), dailyRate: 850,  isActive: true },
-      { id: 'wa_04', projectId: 'prj_02', workerId: 'wkr_05', contractorId: 'con_01', siteId: 'site_02', role: 'Lead Carpenter',   startDate: d(-40), dailyRate: 900,  isActive: true },
-      { id: 'wa_05', projectId: 'prj_02', workerId: 'wkr_17', contractorId: 'con_01', siteId: 'site_02', role: 'Carpenter',        startDate: d(-40), dailyRate: 800,  isActive: true },
-      { id: 'wa_06', projectId: 'prj_03', workerId: 'wkr_07', contractorId: 'con_02', siteId: 'site_03', role: 'Welder',           startDate: d(-18), dailyRate: 950,  isActive: true },
-      { id: 'wa_07', projectId: 'prj_03', workerId: 'wkr_04', contractorId: 'con_02', siteId: 'site_03', role: 'Painter',          startDate: d(-15), dailyRate: 600,  isActive: true },
-      { id: 'wa_08', projectId: 'prj_05', workerId: 'wkr_09', contractorId: 'con_04', siteId: 'site_05', role: 'Lead Plumber',     startDate: d(-175), endDate: d(-15), dailyRate: 850, isActive: false },
-      { id: 'wa_09', projectId: 'prj_05', workerId: 'wkr_06', contractorId: 'con_04', siteId: 'site_05', role: 'Plumber',          startDate: d(-175), endDate: d(-15), dailyRate: 700, isActive: false },
+      { id: 'wa_01', projectId: 'prj_01', workerId: 'wkr_01', contractorId: 'con_01', siteId: 'ste_01', role: 'Lead Mason',       startDate: d(-85), dailyRate: 800,  isActive: true },
+      { id: 'wa_02', projectId: 'prj_01', workerId: 'wkr_15', contractorId: 'con_01', siteId: 'ste_01', role: 'Mason',            startDate: d(-80), dailyRate: 750,  isActive: true },
+      { id: 'wa_03', projectId: 'prj_01', workerId: 'wkr_09', contractorId: 'con_01', siteId: 'ste_01', role: 'Plumber',          startDate: d(-70), dailyRate: 850,  isActive: true },
+      { id: 'wa_04', projectId: 'prj_02', workerId: 'wkr_05', contractorId: 'con_01', siteId: 'ste_02', role: 'Lead Carpenter',   startDate: d(-40), dailyRate: 900,  isActive: true },
+      { id: 'wa_05', projectId: 'prj_02', workerId: 'wkr_17', contractorId: 'con_01', siteId: 'ste_02', role: 'Carpenter',        startDate: d(-40), dailyRate: 800,  isActive: true },
+      { id: 'wa_06', projectId: 'prj_03', workerId: 'wkr_07', contractorId: 'con_02', siteId: 'ste_03', role: 'Welder',           startDate: d(-18), dailyRate: 950,  isActive: true },
+      { id: 'wa_07', projectId: 'prj_03', workerId: 'wkr_04', contractorId: 'con_02', siteId: 'ste_03', role: 'Painter',          startDate: d(-15), dailyRate: 600,  isActive: true },
+      { id: 'wa_08', projectId: 'prj_05', workerId: 'wkr_09', contractorId: 'con_04', siteId: 'ste_05', role: 'Lead Plumber',     startDate: d(-175), endDate: d(-15), dailyRate: 850, isActive: false },
+      { id: 'wa_09', projectId: 'prj_05', workerId: 'wkr_06', contractorId: 'con_04', siteId: 'ste_05', role: 'Plumber',          startDate: d(-175), endDate: d(-15), dailyRate: 700, isActive: false },
     ],
     skipDuplicates: true,
   });
@@ -553,11 +553,11 @@ async function main() {
   // ── DAY 3: Attendance Records ──────────────────────────────────────
   const attRecords = [];
   const workerSiteJobPairs = [
-    { workerId: 'wkr_01', jobId: 'job_01', siteId: 'site_01', contractorId: 'con_01' },
-    { workerId: 'wkr_09', jobId: 'job_05', siteId: 'site_01', contractorId: 'con_01' },
-    { workerId: 'wkr_03', jobId: 'job_11', siteId: 'site_04', contractorId: 'con_03' },
-    { workerId: 'wkr_13', jobId: 'job_11', siteId: 'site_04', contractorId: 'con_03' },
-    { workerId: 'wkr_07', jobId: 'job_21', siteId: 'site_05', contractorId: 'con_05' },
+    { workerId: 'wkr_01', jobId: 'job_01', siteId: 'ste_01', contractorId: 'con_01' },
+    { workerId: 'wkr_09', jobId: 'job_05', siteId: 'ste_01', contractorId: 'con_01' },
+    { workerId: 'wkr_03', jobId: 'job_11', siteId: 'ste_04', contractorId: 'con_03' },
+    { workerId: 'wkr_13', jobId: 'job_11', siteId: 'ste_04', contractorId: 'con_03' },
+    { workerId: 'wkr_07', jobId: 'job_21', siteId: 'ste_05', contractorId: 'con_05' },
   ];
 
   for (const pair of workerSiteJobPairs) {
@@ -647,17 +647,17 @@ async function main() {
   // ── DAY 3: Hire Records ───────────────────────────────────────────
   await prisma.hireRecord.createMany({
     data: [
-      { id: 'hr_01', applicationId: 'app_001', jobId: 'job_01', workerId: 'wkr_01', contractorId: 'con_01', siteId: 'site_01', agreedDailyWage: 800,  startDate: d(-85), isActive: true },
-      { id: 'hr_02', applicationId: 'app_006', jobId: 'job_02', workerId: 'wkr_01', contractorId: 'con_01', siteId: 'site_02', agreedDailyWage: 800,  startDate: d(-40), isActive: true },
-      { id: 'hr_03', applicationId: 'app_013', jobId: 'job_05', workerId: 'wkr_09', contractorId: 'con_01', siteId: 'site_01', agreedDailyWage: 850,  startDate: d(-70), isActive: true },
-      { id: 'hr_04', applicationId: 'app_016', jobId: 'job_06', workerId: 'wkr_05', contractorId: 'con_02', siteId: 'site_03', agreedDailyWage: 900,  startDate: d(-18), isActive: true },
-      { id: 'hr_05', applicationId: 'app_017', jobId: 'job_06', workerId: 'wkr_17', contractorId: 'con_02', siteId: 'site_03', agreedDailyWage: 800,  startDate: d(-18), isActive: true },
-      { id: 'hr_06', applicationId: 'app_018', jobId: 'job_06', workerId: 'wkr_07', contractorId: 'con_02', siteId: 'site_03', agreedDailyWage: 950,  startDate: d(-15), isActive: true },
-      { id: 'hr_07', applicationId: 'app_030', jobId: 'job_11', workerId: 'wkr_03', contractorId: 'con_03', siteId: 'site_04', agreedDailyWage: 950,  startDate: d(-55), isActive: true },
-      { id: 'hr_08', applicationId: 'app_031', jobId: 'job_11', workerId: 'wkr_13', contractorId: 'con_03', siteId: 'site_04', agreedDailyWage: 850,  startDate: d(-55), isActive: true },
-      { id: 'hr_09', applicationId: 'app_036', jobId: 'job_16', workerId: 'wkr_09', contractorId: 'con_04', siteId: 'site_05', agreedDailyWage: 850,  startDate: d(-175), endDate: d(-15), isActive: false },
-      { id: 'hr_10', applicationId: 'app_046', jobId: 'job_21', workerId: 'wkr_07', contractorId: 'con_05', siteId: 'site_05', agreedDailyWage: 950,  startDate: d(-60), isActive: true },
-      { id: 'hr_11', applicationId: 'app_047', jobId: 'job_21', workerId: 'wkr_17', contractorId: 'con_05', siteId: 'site_05', agreedDailyWage: 800,  startDate: d(-58), isActive: true },
+      { id: 'hr_01', applicationId: 'app_001', jobId: 'job_01', workerId: 'wkr_01', contractorId: 'con_01', siteId: 'ste_01', agreedDailyWage: 800,  startDate: d(-85), isActive: true },
+      { id: 'hr_02', applicationId: 'app_006', jobId: 'job_02', workerId: 'wkr_01', contractorId: 'con_01', siteId: 'ste_02', agreedDailyWage: 800,  startDate: d(-40), isActive: true },
+      { id: 'hr_03', applicationId: 'app_013', jobId: 'job_05', workerId: 'wkr_09', contractorId: 'con_01', siteId: 'ste_01', agreedDailyWage: 850,  startDate: d(-70), isActive: true },
+      { id: 'hr_04', applicationId: 'app_016', jobId: 'job_06', workerId: 'wkr_05', contractorId: 'con_02', siteId: 'ste_03', agreedDailyWage: 900,  startDate: d(-18), isActive: true },
+      { id: 'hr_05', applicationId: 'app_017', jobId: 'job_06', workerId: 'wkr_17', contractorId: 'con_02', siteId: 'ste_03', agreedDailyWage: 800,  startDate: d(-18), isActive: true },
+      { id: 'hr_06', applicationId: 'app_018', jobId: 'job_06', workerId: 'wkr_07', contractorId: 'con_02', siteId: 'ste_03', agreedDailyWage: 950,  startDate: d(-15), isActive: true },
+      { id: 'hr_07', applicationId: 'app_030', jobId: 'job_11', workerId: 'wkr_03', contractorId: 'con_03', siteId: 'ste_04', agreedDailyWage: 950,  startDate: d(-55), isActive: true },
+      { id: 'hr_08', applicationId: 'app_031', jobId: 'job_11', workerId: 'wkr_13', contractorId: 'con_03', siteId: 'ste_04', agreedDailyWage: 850,  startDate: d(-55), isActive: true },
+      { id: 'hr_09', applicationId: 'app_036', jobId: 'job_16', workerId: 'wkr_09', contractorId: 'con_04', siteId: 'ste_05', agreedDailyWage: 850,  startDate: d(-175), endDate: d(-15), isActive: false },
+      { id: 'hr_10', applicationId: 'app_046', jobId: 'job_21', workerId: 'wkr_07', contractorId: 'con_05', siteId: 'ste_05', agreedDailyWage: 950,  startDate: d(-60), isActive: true },
+      { id: 'hr_11', applicationId: 'app_047', jobId: 'job_21', workerId: 'wkr_17', contractorId: 'con_05', siteId: 'ste_05', agreedDailyWage: 800,  startDate: d(-58), isActive: true },
     ],
     skipDuplicates: true,
   });
