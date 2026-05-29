@@ -114,7 +114,7 @@ export default function AdminCompaniesPage() {
   const handleSearch = (e: React.FormEvent) => { e.preventDefault(); setPage(1); fetchCompanies(); };
 
   return (
-    <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-5">
+    <div className="p-4 sm:p-6 space-y-5">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Companies</h1>

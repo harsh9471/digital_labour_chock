@@ -4,12 +4,11 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { api, tokenStorage } from '@/lib/api';
 import type { AuthState, AuthTokens, LoginFormData, LoginResponse, OtpFormData, RegisterFormData, User } from '@/types';
 
-// Lightweight session cookie so middleware knows a session exists
-// (actual JWT lives in localStorage — not accessible to middleware)
+// Session cookie for middleware route protection (not for auth data storage)
 const sessionCookie = {
   set: (role: string) => {
     if (typeof document === 'undefined') return;
-    const maxAge = 7 * 24 * 60 * 60; // 7 days — matches refresh token lifetime
+    const maxAge = 7 * 24 * 60 * 60;
     document.cookie = `dlc_session=1; path=/; max-age=${maxAge}; SameSite=Lax`;
     document.cookie = `dlc_role=${role}; path=/; max-age=${maxAge}; SameSite=Lax`;
   },
@@ -41,6 +40,12 @@ const initialState: AuthState = {
   isLoading: false,
 };
 
+// Each tab gets its own sessionStorage, so Worker/Contractor/Admin can be
+// logged in simultaneously in different tabs without conflicts.
+const tabStorage = createJSONStorage(() =>
+  typeof window !== 'undefined' ? sessionStorage : localStorage,
+);
+
 export const useAuthStore = create<AuthStore>()(
   persist(
     (set, get) => ({
@@ -63,6 +68,7 @@ export const useAuthStore = create<AuthStore>()(
 
       sendOtp: async (phone: string, purpose: string) => {
         const res = await api.post<{ success: boolean; data: { message: string; expiresInMinutes: number; phone: string; devOtp?: string } }>('/auth/otp/send', { phone, purpose });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return (res as any).data as { devOtp?: string; message: string; expiresInMinutes: number; phone: string };
       },
 
@@ -95,11 +101,9 @@ export const useAuthStore = create<AuthStore>()(
       logout: async () => {
         try {
           const { tokens } = get();
-          if (tokens) {
-            await api.post('/auth/logout');
-          }
+          if (tokens) await api.post('/auth/logout');
         } catch {
-          // Ignore logout errors
+          // ignore
         } finally {
           tokenStorage.clearTokens();
           sessionCookie.clear();
@@ -109,10 +113,7 @@ export const useAuthStore = create<AuthStore>()(
 
       refreshSession: async () => {
         const refreshToken = tokenStorage.getRefreshToken();
-        if (!refreshToken) {
-          set(initialState);
-          return;
-        }
+        if (!refreshToken) { set(initialState); return; }
         try {
           const response = await api.post<{ success: boolean; data: AuthTokens }>('/auth/refresh', { refreshToken });
           const tokens = response.data;
@@ -137,7 +138,7 @@ export const useAuthStore = create<AuthStore>()(
     }),
     {
       name: 'dlc-auth',
-      storage: createJSONStorage(() => localStorage),
+      storage: tabStorage,
       partialize: (state) => ({
         user: state.user,
         tokens: state.tokens,

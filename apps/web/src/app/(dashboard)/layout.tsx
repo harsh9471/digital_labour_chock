@@ -458,15 +458,6 @@ function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
         {/* Notification bell */}
         <NotificationBell />
 
-        {/* Quick action hint on mobile */}
-        <button
-          type="button"
-          className="lg:hidden p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors"
-          aria-label="Quick actions"
-        >
-          <Zap className="h-5 w-5" />
-        </button>
-
         {/* Divider */}
         <div className="hidden sm:block w-px h-6 bg-slate-200 mx-1" />
 

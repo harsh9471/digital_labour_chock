@@ -84,7 +84,7 @@ export default function ContractorJobDetailPage() {
 
   if (loading) {
     return (
-      <div className="p-6 space-y-4 animate-pulse max-w-4xl mx-auto">
+      <div className="p-6 space-y-4 animate-pulse max-w-4xl">
         <div className="h-8 bg-gray-100 rounded-xl w-48" />
         <div className="h-56 bg-gray-100 rounded-2xl" />
         <div className="h-72 bg-gray-100 rounded-2xl" />
@@ -94,7 +94,7 @@ export default function ContractorJobDetailPage() {
 
   if (!job) {
     return (
-      <div className="p-6 max-w-4xl mx-auto text-center py-20">
+      <div className="p-6 max-w-4xl text-center py-20">
         <Briefcase className="h-12 w-12 text-gray-200 mx-auto mb-4" />
         <h3 className="font-semibold text-gray-700 text-lg">Job not found</h3>
         <Link href="/contractor/jobs"><Button variant="outline" className="mt-4">Back to Jobs</Button></Link>
@@ -105,7 +105,7 @@ export default function ContractorJobDetailPage() {
   const jobStatusCfg = JOB_STATUS_CONFIG[job.status] ?? { cls: 'bg-gray-100 text-gray-600 border-gray-200' };
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 max-w-4xl mx-auto">
+    <div className="p-4 sm:p-6 space-y-6 max-w-4xl">
       {/* Back */}
       <div className="flex items-center gap-3">
         <button onClick={() => router.back()} className="p-2 rounded-xl hover:bg-gray-100 transition-colors">

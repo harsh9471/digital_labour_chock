@@ -173,7 +173,7 @@ export default function WorkerProfilePage() {
   const availableSkills = allSkills.filter(s => !existingSkillIds.has(s.id));
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 max-w-4xl mx-auto">
+    <div className="p-4 sm:p-6 space-y-6 max-w-4xl">
       {/* Profile header */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="h-24 bg-gradient-to-r from-emerald-500 to-teal-600" />
