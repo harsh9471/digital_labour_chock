@@ -39,6 +39,20 @@ export class AttendanceService {
       throw new BadRequestException('No active job assignment found. You must be hired for a job before checking in.');
     }
 
+    // Resolve siteId: hire record may not have one, fall back to the job's site
+    let resolvedSiteId = hire.siteId;
+    if (!resolvedSiteId) {
+      const job = await this.prisma.job.findUnique({
+        where: { id: hire.jobId },
+        select: { siteId: true },
+      });
+      resolvedSiteId = job?.siteId ?? null;
+    }
+
+    if (!resolvedSiteId) {
+      throw new BadRequestException('No site assigned to your job. Ask your contractor to assign a site first.');
+    }
+
     // Prevent duplicate active check-in
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -51,7 +65,7 @@ export class AttendanceService {
       data: {
         workerId: worker.id,
         jobId: hire.jobId,
-        siteId: hire.siteId ?? hire.jobId, // fallback to jobId if no site
+        siteId: resolvedSiteId,
         contractorId: hire.contractorId,
         checkInTime: new Date(),
         checkInLat: dto.checkInLat ?? null,

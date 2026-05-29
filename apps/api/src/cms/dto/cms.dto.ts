@@ -41,6 +41,7 @@ export class CreateCmsPageDto {
 
 export class UpdateCmsPageDto {
   @ApiPropertyOptional() @IsOptional() @IsString() title?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() slug?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() content?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() excerpt?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() metaTitle?: string;
