@@ -112,7 +112,7 @@ export default function ContractorDashboardPage() {
   }
 
   return (
-    <div className="p-4 sm:p-6 space-y-6">
+    <div className="min-h-screen bg-slate-100 p-4 sm:p-6 space-y-6">
 
       {/* ── Hero welcome banner ── */}
       <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 p-6 text-white shadow-lg">
@@ -166,50 +166,50 @@ export default function ContractorDashboardPage() {
         <StatCard
           label="Total Jobs" value={stats.totalJobs}
           icon={Briefcase} sub="All time"
-          gradient="bg-gradient-to-br from-blue-50 to-indigo-100 text-blue-900"
-          iconBg="bg-blue-500 text-white"
+          gradient="bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/20"
+          iconBg="bg-white/20 text-white"
         />
         <StatCard
           label="Active Jobs" value={stats.activeJobs}
           icon={Zap} sub="Live now"
-          gradient="bg-gradient-to-br from-emerald-50 to-teal-100 text-emerald-900"
-          iconBg="bg-emerald-500 text-white"
+          gradient="bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20"
+          iconBg="bg-white/20 text-white"
         />
         <StatCard
           label="Total Applicants" value={stats.totalApps}
           icon={Users} sub="Across all jobs"
-          gradient="bg-gradient-to-br from-purple-50 to-violet-100 text-purple-900"
-          iconBg="bg-purple-500 text-white"
+          gradient="bg-gradient-to-br from-purple-500 to-violet-600 text-white shadow-lg shadow-purple-500/20"
+          iconBg="bg-white/20 text-white"
         />
         <StatCard
           label="Workers Hired" value={stats.hiredWorkers}
           icon={CheckCircle} sub="Successful hires"
-          gradient="bg-gradient-to-br from-teal-50 to-cyan-100 text-teal-900"
-          iconBg="bg-teal-500 text-white"
+          gradient="bg-gradient-to-br from-teal-500 to-cyan-600 text-white shadow-lg shadow-teal-500/20"
+          iconBg="bg-white/20 text-white"
         />
         <StatCard
           label="Avg Apps/Job" value={stats.avgApps}
           icon={TrendingUp} sub="Interest level"
-          gradient="bg-gradient-to-br from-indigo-50 to-blue-100 text-indigo-900"
-          iconBg="bg-indigo-500 text-white"
+          gradient="bg-gradient-to-br from-indigo-500 to-blue-600 text-white shadow-lg shadow-indigo-500/20"
+          iconBg="bg-white/20 text-white"
         />
         <StatCard
           label="Total Spent" value={formatCurrency(stats.totalSpent)}
           icon={IndianRupee} sub="Wage payouts"
-          gradient="bg-gradient-to-br from-green-50 to-emerald-100 text-green-900"
-          iconBg="bg-green-600 text-white"
+          gradient="bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/20"
+          iconBg="bg-white/20 text-white"
         />
         <StatCard
           label="Pending Review" value={0}
           icon={Clock} sub="Need action"
-          gradient="bg-gradient-to-br from-amber-50 to-orange-100 text-amber-900"
-          iconBg="bg-amber-500 text-white"
+          gradient="bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/20"
+          iconBg="bg-white/20 text-white"
         />
         <StatCard
           label="Avg Rating" value="4.6/5"
           icon={Star} sub="Worker satisfaction"
-          gradient="bg-gradient-to-br from-yellow-50 to-amber-100 text-yellow-900"
-          iconBg="bg-yellow-500 text-white"
+          gradient="bg-gradient-to-br from-rose-500 to-pink-600 text-white shadow-lg shadow-rose-500/20"
+          iconBg="bg-white/20 text-white"
         />
       </div>
 
@@ -267,9 +267,17 @@ export default function ContractorDashboardPage() {
         ) : (
           <>
             <div className={`divide-y divide-gray-50 transition-opacity ${jobsLoading ? 'opacity-50' : ''}`}>
-              {jobs.map((job: Job) => (
+              {jobs.map((job: Job) => {
+                const rowBorder: Record<string, string> = {
+                  PUBLISHED: 'border-l-4 border-l-blue-500',
+                  ACTIVE:    'border-l-4 border-l-emerald-500',
+                  FILLED:    'border-l-4 border-l-purple-500',
+                  DRAFT:     'border-l-4 border-l-gray-300',
+                };
+                const borderCls = rowBorder[job.status] ?? 'border-l-4 border-l-gray-200';
+                return (
                 <Link key={job.id} href={`/contractor/jobs/${job.id}`}
-                  className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50/80 transition-colors group">
+                  className={`flex items-center gap-4 px-5 py-4 hover:bg-gray-50/80 transition-colors group ${borderCls}`}>
                   <div className="w-10 h-10 rounded-xl bg-blue-50 group-hover:bg-blue-100 flex items-center justify-center shrink-0 transition-colors">
                     <Briefcase className="h-4 w-4 text-blue-600" />
                   </div>
@@ -295,7 +303,8 @@ export default function ContractorDashboardPage() {
                     <span className="text-[11px] text-gray-400">{formatDate(job.createdAt)}</span>
                   </div>
                 </Link>
-              ))}
+                );
+              })}
             </div>
 
             {totalPages > 1 && (

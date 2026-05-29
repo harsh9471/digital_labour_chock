@@ -86,19 +86,19 @@ export default function ContractorAttendancePage() {
       {/* Today summary cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: "Today's Present", value: todaySummary?.totalPresent ?? '—', color: 'text-emerald-700', bg: 'bg-emerald-50', icon: CheckCircle, iconCls: 'text-emerald-500' },
-          { label: "Today's Absent",  value: todaySummary?.totalAbsent ?? '—',  color: 'text-red-700',     bg: 'bg-red-50',     icon: XCircle,     iconCls: 'text-red-400' },
-          { label: 'Half Day',        value: todaySummary?.totalHalfDay ?? '—', color: 'text-amber-700',   bg: 'bg-amber-50',   icon: MinusCircle, iconCls: 'text-amber-500' },
-          { label: 'Attendance Rate', value: todaySummary ? `${todaySummary.attendanceRate.toFixed(0)}%` : '—', color: 'text-blue-700', bg: 'bg-blue-50', icon: TrendingUp, iconCls: 'text-blue-500' },
+          { label: "Today's Present", value: todaySummary?.totalPresent ?? '—', gradient: 'from-emerald-500 to-teal-600',  shadow: 'shadow-emerald-500/20', icon: CheckCircle },
+          { label: "Today's Absent",  value: todaySummary?.totalAbsent ?? '—',  gradient: 'from-rose-500 to-pink-600',     shadow: 'shadow-rose-500/20',    icon: XCircle },
+          { label: 'Half Day',        value: todaySummary?.totalHalfDay ?? '—', gradient: 'from-amber-500 to-orange-500',  shadow: 'shadow-amber-500/20',   icon: MinusCircle },
+          { label: 'Attendance Rate', value: todaySummary ? `${todaySummary.attendanceRate.toFixed(0)}%` : '—', gradient: 'from-blue-600 to-blue-700', shadow: 'shadow-blue-500/20', icon: TrendingUp },
         ].map(s => {
           const Icon = s.icon;
           return (
-            <div key={s.label} className={`${s.bg} rounded-2xl p-4 flex items-start justify-between`}>
+            <div key={s.label} className={`bg-gradient-to-br ${s.gradient} rounded-2xl p-4 text-white shadow-lg ${s.shadow} flex items-start justify-between`}>
               <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{s.label}</p>
-                <p className={`text-2xl font-bold mt-1 ${s.color}`}>{s.value}</p>
+                <p className="text-xs font-semibold uppercase tracking-wide opacity-80">{s.label}</p>
+                <p className="text-2xl font-bold mt-1">{s.value}</p>
               </div>
-              <Icon className={`h-6 w-6 mt-1 ${s.iconCls}`} />
+              <Icon className="h-6 w-6 mt-1 opacity-80" />
             </div>
           );
         })}
@@ -169,8 +169,13 @@ export default function ContractorAttendancePage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {filtered.map(r => (
-                    <tr key={r.id} className="hover:bg-gray-50/50 transition-colors">
+                  {filtered.map(r => {
+                    const rowBorder = r.status === 'PRESENT' ? 'border-l-4 border-l-emerald-500'
+                      : r.status === 'ABSENT' ? 'border-l-4 border-l-red-400'
+                      : r.status === 'HALF_DAY' ? 'border-l-4 border-l-amber-400'
+                      : 'border-l-4 border-l-transparent';
+                    return (
+                    <tr key={r.id} className={`hover:bg-gray-50/50 transition-colors ${rowBorder}`}>
                       <td className="px-5 py-3.5 font-medium text-gray-900">
                         {r.worker?.user.firstName} {r.worker?.user.lastName}
                       </td>
@@ -187,15 +192,21 @@ export default function ContractorAttendancePage() {
                       </td>
                       <td className="px-5 py-3.5"><StatusBadge status={r.status} /></td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
 
             {/* Mobile cards */}
             <div className="md:hidden divide-y divide-gray-50">
-              {filtered.map(r => (
-                <div key={r.id} className="px-4 py-3.5 space-y-2">
+              {filtered.map(r => {
+                const mobileBorder = r.status === 'PRESENT' ? 'border-l-4 border-l-emerald-500'
+                  : r.status === 'ABSENT' ? 'border-l-4 border-l-red-400'
+                  : r.status === 'HALF_DAY' ? 'border-l-4 border-l-amber-400'
+                  : 'border-l-4 border-l-transparent';
+                return (
+                <div key={r.id} className={`px-4 py-3.5 space-y-2 ${mobileBorder}`}>
                   <div className="flex items-center justify-between">
                     <p className="font-semibold text-gray-900 text-sm">
                       {r.worker?.user.firstName} {r.worker?.user.lastName}
@@ -208,7 +219,8 @@ export default function ContractorAttendancePage() {
                     {r.totalHours != null && <span className="font-medium text-gray-700">{Number(r.totalHours).toFixed(1)}h</span>}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
 
             {totalPages > 1 && (

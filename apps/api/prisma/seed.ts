@@ -663,6 +663,48 @@ async function main() {
   });
   console.log('✅  Hire Records (11)');
 
+  // ── Additional sites for better demo ──
+  await prisma.site.createMany({
+    data: [
+      { id:'ste_06', contractorId:'con_01', name:'Bandra West Luxury Apartments', description:'Premium residential project with 48 units', address:'Plot 12, Bandra West', city:'Mumbai', state:'Maharashtra', pincode:'400050', latitude:19.0596, longitude:72.8295, radiusMeters:250, isActive:true, totalWorkers:22 },
+      { id:'ste_07', contractorId:'con_01', name:'Powai IT Campus Phase 2', description:'Commercial IT park expansion', address:'Hiranandani Business Park, Powai', city:'Mumbai', state:'Maharashtra', pincode:'400076', latitude:19.1176, longitude:72.9060, radiusMeters:350, isActive:true, totalWorkers:31 },
+      { id:'ste_08', contractorId:'con_02', name:'CP Metro Station Renovation', description:'Underground metro station renovation work', address:'Station Road, CP', city:'Delhi', state:'Delhi', pincode:'110001', latitude:28.6317, longitude:77.2195, radiusMeters:200, isActive:true, totalWorkers:15 },
+      { id:'ste_09', contractorId:'con_03', name:'Indiranagar Commercial Complex', description:'5-floor commercial plaza construction', address:'100 Feet Road, Indiranagar', city:'Bangalore', state:'Karnataka', pincode:'560038', latitude:12.9784, longitude:77.6408, radiusMeters:300, isActive:false, totalWorkers:0 },
+    ],
+    skipDuplicates: true,
+  });
+  console.log('✅  Additional Sites (4)');
+
+  // ── Additional attendance for better demo (contractor 1 workers) ──
+  const additionalAttPairs = [
+    { workerId:'wkr_02', jobId:'job_02', siteId:'ste_01', contractorId:'con_01' },
+    { workerId:'wkr_04', jobId:'job_03', siteId:'ste_01', contractorId:'con_01' },
+    { workerId:'wkr_06', jobId:'job_04', siteId:'ste_06', contractorId:'con_01' },
+  ];
+  const additionalAttRecords = [];
+  for (const pair of additionalAttPairs) {
+    for (let day = 10; day >= 0; day--) {
+      if (Math.random() > 0.1) {
+        const checkIn = new Date();
+        checkIn.setDate(checkIn.getDate() - day);
+        checkIn.setHours(8, Math.floor(Math.random() * 30), 0, 0);
+        const checkOut = new Date(checkIn);
+        checkOut.setHours(17 + Math.floor(Math.random() * 2), Math.floor(Math.random() * 60), 0, 0);
+        const totalHours = parseFloat(((checkOut.getTime() - checkIn.getTime()) / 3_600_000).toFixed(2));
+        additionalAttRecords.push({
+          workerId: pair.workerId, jobId: pair.jobId, siteId: pair.siteId, contractorId: pair.contractorId,
+          checkInTime: checkIn, checkOutTime: checkOut, checkInLat: 19.0760, checkInLon: 72.8777,
+          checkOutLat: 19.0760, checkOutLon: 72.8777, geoFenceValid: true, method: 'GPS' as const,
+          totalHours, isFlagged: false,
+        });
+      }
+    }
+  }
+  for (const record of additionalAttRecords) {
+    await prisma.attendanceRecord.create({ data: record }).catch(() => {});
+  }
+  console.log(`✅  Additional Attendance Records (~${additionalAttRecords.length})`);
+
   // ── DAY 5: Notification Templates ──────────────────────────────────
   await prisma.notificationTemplate.createMany({
     data: [
@@ -762,6 +804,26 @@ async function main() {
     skipDuplicates: true,
   });
   console.log('✅  Admin Reports (3)');
+
+  // ── DAY 5: Audit Logs ──────────────────────────────────────────────
+  await prisma.auditLog.createMany({
+    data: [
+      { userId:'usr_adm_01', userRole:'SUPER_ADMIN', action:'USER_STATUS_UPDATE', resourceType:'User', resourceId:'usr_wkr_01', before:{ status:'PENDING_VERIFICATION' }, after:{ status:'ACTIVE', reason:'KYC documents verified' }, ipAddress:'192.168.1.10', userAgent:'Mozilla/5.0 Chrome/121' },
+      { userId:'usr_adm_01', userRole:'SUPER_ADMIN', action:'DOCUMENT_VERIFIED',  resourceType:'Document', resourceId:'doc_001', after:{ status:'VERIFIED', documentType:'AADHAR' }, ipAddress:'192.168.1.10', userAgent:'Mozilla/5.0 Chrome/121' },
+      { userId:'usr_adm_01', userRole:'SUPER_ADMIN', action:'DOCUMENT_VERIFIED',  resourceType:'Document', resourceId:'doc_002', after:{ status:'VERIFIED', documentType:'PAN' }, ipAddress:'192.168.1.10', userAgent:'Mozilla/5.0 Chrome/121' },
+      { userId:'usr_adm_01', userRole:'SUPER_ADMIN', action:'CONTRACTOR_VERIFIED', resourceType:'Contractor', resourceId:'con_01', before:{ isVerified:false }, after:{ isVerified:true }, ipAddress:'192.168.1.10', userAgent:'Mozilla/5.0 Chrome/121' },
+      { userId:'usr_adm_01', userRole:'SUPER_ADMIN', action:'CONTRACTOR_VERIFIED', resourceType:'Contractor', resourceId:'con_02', before:{ isVerified:false }, after:{ isVerified:true }, ipAddress:'192.168.1.10', userAgent:'Mozilla/5.0 Chrome/121' },
+      { userId:'usr_adm_01', userRole:'SUPER_ADMIN', action:'COMPANY_VERIFIED',    resourceType:'Company', resourceId:'cmp_01', before:{ isVerified:false }, after:{ isVerified:true }, ipAddress:'192.168.1.11', userAgent:'Mozilla/5.0 Chrome/121' },
+      { userId:'usr_adm_01', userRole:'SUPER_ADMIN', action:'WORKER_KYC_UPDATE',   resourceType:'Worker', resourceId:'wkr_01', before:{ kycStatus:'PENDING' }, after:{ kycStatus:'VERIFIED' }, ipAddress:'192.168.1.11', userAgent:'Mozilla/5.0 Chrome/121' },
+      { userId:'usr_adm_01', userRole:'SUPER_ADMIN', action:'WORKER_KYC_UPDATE',   resourceType:'Worker', resourceId:'wkr_03', before:{ kycStatus:'PENDING' }, after:{ kycStatus:'VERIFIED' }, ipAddress:'192.168.1.11', userAgent:'Mozilla/5.0 Chrome/121' },
+      { userId:'usr_adm_01', userRole:'SUPER_ADMIN', action:'USER_STATUS_UPDATE', resourceType:'User', resourceId:'usr_con_03', before:{ status:'ACTIVE' }, after:{ status:'SUSPENDED', reason:'Reported multiple complaints' }, ipAddress:'192.168.1.12', userAgent:'Mozilla/5.0 Chrome/121' },
+      { userId:'usr_adm_01', userRole:'SUPER_ADMIN', action:'DOCUMENT_REJECTED',   resourceType:'Document', resourceId:'doc_003', after:{ status:'REJECTED', reason:'Document unclear and not readable' }, ipAddress:'192.168.1.12', userAgent:'Mozilla/5.0 Chrome/121' },
+      { userId:'usr_adm_01', userRole:'SUPER_ADMIN', action:'CONTRACTOR_VERIFIED', resourceType:'Contractor', resourceId:'con_03', before:{ isVerified:false }, after:{ isVerified:true }, ipAddress:'192.168.1.12', userAgent:'Mozilla/5.0 Chrome/121' },
+      { userId:'usr_adm_01', userRole:'SUPER_ADMIN', action:'COMPANY_VERIFIED',    resourceType:'Company', resourceId:'cmp_02', before:{ isVerified:false }, after:{ isVerified:true }, ipAddress:'192.168.1.13', userAgent:'Mozilla/5.0 Chrome/121' },
+    ],
+    skipDuplicates: true,
+  });
+  console.log('✅  Audit Logs (12)');
 
   console.log('\n🎉  Seed complete!');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');

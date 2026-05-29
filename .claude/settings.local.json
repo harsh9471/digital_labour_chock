@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"database\")",
+      "PowerShell(psql --version 2>$null)",
+      "PowerShell(if \\($LASTEXITCODE -ne 0\\) { \"psql not found in PATH\" } else { \"psql available\" })",
+      "PowerShell(cd \"f:\\\\Claude Practical\\\\DigitalLabourChowk\\\\apps\\\\api\"; $env:HUSKY=0; npm install 2>&1 | Select-Object -Last 5)",
+      "Bash(npx prisma *)",
+      "Bash(npm run *)",
+      "Bash(cat \"C:\\\\Users\\\\harsh.shah\\\\AppData\\\\Local\\\\Temp\\\\api-start.log\")",
+      "Bash(where redis-server *)",
+      "Bash(where redis-cli *)",
+      "Bash(sc query *)",
+      "Bash(cat \"C:\\\\Users\\\\harsh.shah\\\\AppData\\\\Local\\\\Temp\\\\api-dev.log\")",
+      "Bash(netstat -ano)",
+      "Bash(awk '{print $5}')",
+      "Bash(read pid *)",
+      "Bash(cd \"f:\\\\Claude Practical\\\\DigitalLabourChowk\\\\apps\\\\web\" && npm run dev 2>&1 | head -60 & *)",
+      "Read(//tmp/**)"
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell($env:PGPASSWORD = \"psspl@123\"; psql -U postgres -h localhost -p 5432 -c \"SELECT version\\(\\);\" 2>&1 | Select-Object -First 5)",
+      "PowerShell($env:PGPASSWORD = \"psspl@123\"; psql -U postgres -h localhost -p 5432 -c \"CREATE DATABASE digital_labour_chowk;\" 2>&1)",
+      "PowerShell(Set-Location \"f:\\\\Yogesh\\\\DigitalLabourChowk\\\\apps\\\\api\"; $env:DATABASE_URL = \"postgresql://postgres:psspl@123@localhost:5432/digital_labour_chowk?schema=public\"; npx prisma migrate dev --name \"init\" --skip-seed 2>&1 | Select-Object -Last 20)",
+      "PowerShell($env:PGPASSWORD = \"psspl@123\"; psql -U postgres -h localhost -p 5432 -d digital_labour_chowk -f \"f:\\\\Yogesh\\\\DigitalLabourChowk\\\\database\\\\seed.sql\" 2>&1 | Select-Object -Last 30)",
+      "PowerShell(New-Item -ItemType File -Force \"f:\\\\Yogesh\\\\DigitalLabourChowk\\\\apps\\\\api\\\\prisma\\\\seed.ts\")",
+      "PowerShell($env:GIT_ASKPASS = \"\"; $env:GIT_TERMINAL_PROMPT = \"0\"; Set-Location \"f:\\\\Yogesh\\\\DigitalLabourChowk\"; git ls-remote https://harshshah9471:nazxi7-Kevvyp-paxjyb@github.com/harshshah9471/digital_labour_chock.git HEAD 2>&1)",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:3001/api/v1/auth/login/email\" -Method POST -ContentType \"application/json\" -Body '{\"email\":\"superadmin@digitallabourchowk.com\",\"password\":\"Password@123\"}' -UseBasicParsing 2>&1)",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:3001/api/v1/auth/login/email\" -Method POST -ContentType \"application/json\" -Body '{\"email\":\"suresh.patil@contractor.com\",\"password\":\"Password@123\"}' -UseBasicParsing 2>&1)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git checkout *)",
+      "Bash(git merge *)",
+      "Bash(git remote *)",
+      "Bash(git push *)",
+      "Bash(Get-ChildItem apps/mobile -Recurse -Name)",
+      "Bash(Select-Object -First 60)",
+      "Bash(npx tsc *)",
+      "Bash(xargs grep -l \"params.*{.*id\\\\|params.*{.*jobId\")",
+      "Bash(xargs grep -l \"\\\\[\")",
+      "Bash(npx nest *)",
+      "Bash(npx next *)",
+      "Bash(npx turbo *)",
+      "Bash(xargs grep -l \"Notification\\\\|notification\")",
+      "Bash(npm install *)",
+      "Bash(xargs grep -l \"res\\\\.data as { data:\")",
+      "Bash(xargs grep -l \"max-w-.*mx-auto\\\\|mx-auto.*max-w-\")",
+      "WebFetch(domain:digitallabourchowk.com)",
+      "Bash(Remove-Item -Recurse -Force .next -ErrorAction SilentlyContinue)"
+    ],
+    "additionalDirectories": [
+      "f:\\Yogesh\\DigitalLabourChowk\\apps\\web\\src\\app\\(dashboard)\\contractor\\jobs"
+    ]
+  }
+}

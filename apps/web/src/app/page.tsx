@@ -3,17 +3,17 @@ import {
   ArrowRight, CheckCircle2, Star, Users, Briefcase,
   MapPin, Shield, Zap, Phone, IndianRupee, Clock,
   ChevronRight, TrendingUp, HardHat, Wrench, Hammer,
-  Paintbrush, Car, ChefHat, Building2
+  Paintbrush, Car, Building2, Quote
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import NavActions from '@/components/home/NavActions';
 
 const stats = [
-  { label: 'Registered Workers', value: '2L+', icon: Users, color: 'text-blue-200' },
-  { label: 'Jobs Completed', value: '50K+', icon: Briefcase, color: 'text-blue-200' },
-  { label: 'Cities Covered', value: '100+', icon: MapPin, color: 'text-blue-200' },
-  { label: 'Average Rating', value: '4.8★', icon: Star, color: 'text-blue-200' },
+  { label: 'Registered Workers', value: '2.5 Lakh+', icon: Users },
+  { label: 'Active Contractors', value: '15,000+', icon: Briefcase },
+  { label: 'Partner Companies', value: '850+', icon: Building2 },
+  { label: 'Active Projects', value: '200+', icon: TrendingUp },
 ];
 
 const features = [
@@ -56,50 +56,70 @@ const features = [
 ];
 
 const skillCategories = [
-  { name: 'Construction', count: '45,000+', icon: Building2, bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700' },
-  { name: 'Plumbing', count: '12,000+', icon: Wrench, bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700' },
-  { name: 'Electrical', count: '18,000+', icon: Zap, bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-700' },
-  { name: 'Carpentry', count: '9,000+', icon: Hammer, bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700' },
-  { name: 'Painting', count: '15,000+', icon: Paintbrush, bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-700' },
-  { name: 'Driving', count: '22,000+', icon: Car, bg: 'bg-indigo-50', border: 'border-indigo-200', text: 'text-indigo-700' },
-  { name: 'Masonry', count: '30,000+', icon: HardHat, bg: 'bg-stone-50', border: 'border-stone-200', text: 'text-stone-700' },
-  { name: 'Welding', count: '8,000+', icon: Shield, bg: 'bg-gray-50', border: 'border-gray-200', text: 'text-gray-700' },
-  { name: 'Cooking', count: '11,000+', icon: ChefHat, bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700' },
+  { name: 'Construction', count: '45,000+', icon: Building2, bg: 'bg-orange-50', text: 'text-orange-700' },
+  { name: 'Plumbing', count: '12,000+', icon: Wrench, bg: 'bg-blue-50', text: 'text-blue-700' },
+  { name: 'Electrical', count: '18,000+', icon: Zap, bg: 'bg-yellow-50', text: 'text-yellow-700' },
+  { name: 'Carpentry', count: '9,000+', icon: Hammer, bg: 'bg-green-50', text: 'text-green-700' },
+  { name: 'Painting', count: '15,000+', icon: Paintbrush, bg: 'bg-purple-50', text: 'text-purple-700' },
+  { name: 'Driving', count: '22,000+', icon: Car, bg: 'bg-indigo-50', text: 'text-indigo-700' },
+  { name: 'Masonry', count: '30,000+', icon: HardHat, bg: 'bg-stone-50', text: 'text-stone-700' },
+  { name: 'Welding', count: '8,000+', icon: Shield, bg: 'bg-gray-50', text: 'text-gray-700' },
 ];
 
 const howItWorks = [
-  { step: '01', title: 'Post a Job', desc: 'Describe the work, set the wage, and specify location in minutes.', icon: Briefcase, color: 'bg-blue-600' },
-  { step: '02', title: 'Browse Workers', desc: 'See verified worker profiles, skills, ratings and past work.', icon: Users, color: 'bg-purple-600' },
-  { step: '03', title: 'Hire & Track', desc: 'Send offer, confirm hire, and track work progress in real-time.', icon: CheckCircle2, color: 'bg-emerald-600' },
-  { step: '04', title: 'Pay Fairly', desc: 'Release payment on job completion — safe and transparent.', icon: IndianRupee, color: 'bg-amber-600' },
+  { step: '01', title: 'Download App / Register', desc: 'Register on the app or web in under 2 minutes with your phone number.', icon: Phone, color: 'bg-blue-600' },
+  { step: '02', title: 'Create Your Profile', desc: 'Add your skills, experience, and upload verification documents.', icon: Users, color: 'bg-purple-600' },
+  { step: '03', title: 'Post Project / Browse Jobs', desc: 'Contractors post projects; workers apply with a single tap.', icon: Briefcase, color: 'bg-orange-600' },
+  { step: '04', title: 'Interview & Hire', desc: 'Chat, review profiles, and confirm your hire on the platform.', icon: CheckCircle2, color: 'bg-emerald-600' },
+  { step: '05', title: 'Work & Get Paid', desc: 'Track attendance, complete work, and receive payment securely.', icon: IndianRupee, color: 'bg-amber-600' },
+];
+
+const companyLogos = [
+  'Sobha Limited', 'L&T Construction', 'Quess Corp', 'TeamLease',
+  'Shapoorji Pallonji', 'DLF', 'Prestige Group', 'Godrej Properties',
 ];
 
 const testimonials = [
   {
-    name: 'Suresh Patil', role: 'Contractor, Mumbai',
-    text: 'Found 3 skilled electricians within 2 hours. The verification process gives me confidence in every hire.',
-    rating: 5, avatar: 'SP',
+    company: 'Sobha Limited',
+    role: 'Head of HR Operations',
+    text: 'Digital Labour Chowk helped us hire 200+ skilled masons in just 2 weeks for our Bangalore project. The verification system is exceptional.',
+    rating: 5,
+    avatar: 'SL',
+    gradient: 'from-blue-500 to-indigo-600',
   },
   {
-    name: 'Ramesh Yadav', role: 'Electrician, Delhi',
-    text: 'Got 8 jobs in my first month. The OTP login is so simple and I always know exactly what I\'ll be paid.',
-    rating: 5, avatar: 'RY',
+    company: 'Quess Corp',
+    role: 'Staffing Manager',
+    text: 'The verification system is outstanding. We\'ve reduced hiring time by 60% using this platform. Our clients are extremely satisfied with worker quality.',
+    rating: 5,
+    avatar: 'QC',
+    gradient: 'from-emerald-500 to-teal-600',
   },
   {
-    name: 'Anita Desai', role: 'Site Contractor, Pune',
-    text: 'Managing 40+ workers across 3 sites is now effortless. The dashboard is clean and everything is in one place.',
-    rating: 5, avatar: 'AD',
+    company: 'L&T Construction',
+    role: 'Project Director',
+    text: 'Managing attendance and payroll for our 500+ daily workers has never been easier. The dashboard is powerful and intuitive.',
+    rating: 5,
+    avatar: 'LT',
+    gradient: 'from-orange-500 to-amber-600',
   },
   {
-    name: 'Priya Sharma', role: 'Interior Designer, Bangalore',
-    text: 'I hire painters and carpenters regularly through this app. The quality of verified workers is outstanding.',
-    rating: 5, avatar: 'PS',
+    company: 'Prestige Group',
+    role: 'Site Manager',
+    text: 'We\'ve onboarded over 350 verified tradespeople through Digital Labour Chowk. The quality and reliability is consistently high.',
+    rating: 5,
+    avatar: 'PG',
+    gradient: 'from-purple-500 to-violet-600',
   },
   {
-    name: 'Harsh Patel', role: 'Contractor, Vadodara',
-    text: 'I hire different kind of skilled person for my day to day life work on construction site. Digital Labour Chwok help me to find right person for right job.',
-    rating: 5, avatar: 'HP',
-  }
+    company: 'DLF',
+    role: 'Construction Head',
+    text: 'The platform transformed our workforce management. Real-time tracking and digital payments have eliminated a lot of manual work.',
+    rating: 5,
+    avatar: 'DL',
+    gradient: 'from-rose-500 to-pink-600',
+  },
 ];
 
 export default function HomePage() {
@@ -120,10 +140,17 @@ export default function HomePage() {
           </Link>
 
           <div className="hidden md:flex items-center gap-1">
-            {['#how-it-works', '#skills', '#features'].map((href, i) => (
+            {[
+              { href: '/about', label: 'About' },
+              { href: '/business', label: 'Business' },
+              { href: '/platform/workers', label: 'Workers' },
+              { href: '/platform/projects', label: 'Projects' },
+              { href: '#how-it-works', label: 'How It Works' },
+              { href: '#skills', label: 'Browse Skills' },
+            ].map(({ href, label }) => (
               <Link key={href} href={href}
                 className="px-3 py-1.5 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-colors">
-                {['How It Works', 'Browse Skills', 'Features'][i]}
+                {label}
               </Link>
             ))}
           </div>
@@ -139,37 +166,42 @@ export default function HomePage() {
           className="absolute inset-0 bg-cover bg-[position:70%_center] md:bg-right bg-no-repeat"
           style={{ backgroundImage: 'url(/hero-new-bg.png)' }}
         />
-        {/* Dark overlay for readability: dark on left, transparent on right */}
+        {/* Dark overlay */}
         <div className="absolute inset-0 bg-slate-900/60 sm:bg-transparent sm:bg-gradient-to-r sm:from-slate-900/95 sm:via-slate-900/60 sm:to-transparent" />
 
         <div className="relative container mx-auto max-w-5xl text-left">
           <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm text-blue-200 font-medium mb-6 backdrop-blur-md shadow-sm">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            🇮🇳 India&apos;s #1 Labour Marketplace
+            🇮🇳 India&apos;s 1st Job Portal for Daily Wage Workers
           </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight mb-6 drop-shadow-lg max-w-2xl">
-            Hire Skilled Workers
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight mb-6 drop-shadow-lg max-w-3xl">
+            India&apos;s 1st Job Portal for
             <br />
-            <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-sm">
-              Instantly Across India
+            <span className="bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent drop-shadow-sm">
+              Daily Wage Workers
             </span>
           </h1>
 
           <p className="text-lg sm:text-xl text-blue-100/90 mb-10 max-w-2xl leading-relaxed">
-            Connect with verified daily-wage workers, craftsmen &amp; contractors.
+            Connect with 2.5 Lakh+ verified skilled workers, craftsmen &amp; contractors across India.
             Post a job in minutes. Hire today.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 mb-10">
+            <Link href="/marketplace">
+              <Button size="lg" className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-8 py-6 text-lg gap-2 shadow-xl shadow-emerald-500/30 rounded-full transition-transform hover:scale-105">
+                Find Jobs <ArrowRight className="h-5 w-5" />
+              </Button>
+            </Link>
             <Link href="/register?role=CONTRACTOR">
               <Button size="lg" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-6 text-lg gap-2 shadow-xl shadow-blue-500/30 rounded-full transition-transform hover:scale-105">
                 Hire Workers <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
-            <Link href="/register?role=WORKER">
-              <Button size="lg" className="w-full sm:w-auto bg-white/10 hover:bg-white/20 border-2 border-white/40 text-white font-bold px-8 py-6 text-lg gap-2 backdrop-blur-md rounded-full transition-transform hover:scale-105">
-                Find Work Near Me
+            <Link href="/platform/projects">
+              <Button size="lg" className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-6 text-lg gap-2 shadow-xl shadow-orange-500/30 rounded-full transition-transform hover:scale-105">
+                Find Projects <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
           </div>
@@ -177,7 +209,7 @@ export default function HomePage() {
           <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-blue-100/70 font-medium max-w-2xl">
             {['Free to register', 'No hidden charges', 'Instant OTP login', '100% verified workers'].map(t => (
               <span key={t} className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-blue-400 shrink-0" /> {t}
+                <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" /> {t}
               </span>
             ))}
           </div>
@@ -185,16 +217,16 @@ export default function HomePage() {
       </section>
 
       {/* ── Stats strip ── */}
-      <section className="bg-blue-600 py-10 px-4">
-        <div className="container mx-auto">
+      <section className="bg-slate-900 py-12 px-4 border-t border-slate-800">
+        <div className="container mx-auto max-w-5xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {stats.map((s) => {
               const Icon = s.icon;
               return (
                 <div key={s.label} className="text-center">
-                  <Icon className={`h-6 w-6 ${s.color} mx-auto mb-2`} />
+                  <Icon className="h-6 w-6 text-blue-400 mx-auto mb-2" />
                   <p className="text-3xl font-bold text-white">{s.value}</p>
-                  <p className="text-sm text-blue-200 mt-0.5">{s.label}</p>
+                  <p className="text-sm text-slate-400 mt-0.5">{s.label}</p>
                 </div>
               );
             })}
@@ -202,30 +234,53 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Company Trust Section ── */}
+      <section className="py-14 bg-white border-b border-gray-100 overflow-hidden">
+        <div className="container mx-auto max-w-5xl px-4 text-center mb-8">
+          <p className="text-sm font-semibold text-gray-400 uppercase tracking-widest">Trusted by India&apos;s Leading Construction Companies</p>
+        </div>
+        <div className="relative flex w-full overflow-hidden group">
+          <div className="absolute top-0 bottom-0 left-0 w-20 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+          <div className="absolute top-0 bottom-0 right-0 w-20 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+          <div className="flex w-max animate-marquee group-hover:[animation-play-state:paused]">
+            {[...companyLogos, ...companyLogos].map((name, idx) => (
+              <div key={`${name}-${idx}`} className="mx-4 shrink-0 flex items-center justify-center px-8 py-4 rounded-2xl border border-gray-200 bg-white shadow-sm hover:shadow-md hover:border-blue-200 transition-all">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center shrink-0">
+                    <Building2 className="h-4 w-4 text-white" />
+                  </div>
+                  <span className="font-bold text-gray-800 text-sm whitespace-nowrap">{name}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── How It Works ── */}
       <section id="how-it-works" className="py-20 px-4 bg-gray-50">
-        <div className="container mx-auto max-w-5xl">
+        <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-14">
             <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">Simple Process</span>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2 mb-3">
-              Start Hiring in 4 Steps
+              Start in 5 Simple Steps
             </h2>
-            <p className="text-gray-500 text-lg">From posting a job to paying the worker — all in one platform</p>
+            <p className="text-gray-500 text-lg">From registration to payment — everything on one platform</p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {howItWorks.map((item, i) => {
               const Icon = item.icon;
               return (
-                <div key={item.step} className="relative bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 hover:-translate-y-1 transition-all duration-300">
+                <div key={item.step} className="relative bg-white rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 hover:-translate-y-1 transition-all duration-300">
                   {i < howItWorks.length - 1 && (
-                    <ChevronRight className="hidden lg:block absolute -right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-300 z-10" />
+                    <ChevronRight className="hidden lg:block absolute -right-2.5 top-8 h-5 w-5 text-gray-300 z-10 bg-white rounded-full" />
                   )}
-                  <div className={`w-12 h-12 rounded-2xl ${item.color} flex items-center justify-center mb-4 shadow-md`}>
-                    <Icon className="h-6 w-6 text-white" />
+                  <div className={`w-11 h-11 rounded-2xl ${item.color} flex items-center justify-center mb-4 shadow-md`}>
+                    <Icon className="h-5 w-5 text-white" />
                   </div>
-                  <span className="text-xs font-bold text-gray-400 tracking-widest">STEP {item.step}</span>
-                  <h3 className="font-bold text-gray-900 mt-1 mb-2">{item.title}</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
+                  <span className="text-[10px] font-bold text-gray-400 tracking-widest">STEP {item.step}</span>
+                  <h3 className="font-bold text-gray-900 mt-1 mb-1.5 text-sm">{item.title}</h3>
+                  <p className="text-xs text-gray-500 leading-relaxed">{item.desc}</p>
                 </div>
               );
             })}
@@ -241,14 +296,14 @@ export default function HomePage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2 mb-3">
               Find Workers by Skill
             </h2>
-            <p className="text-gray-500 text-lg">From construction to cooking — workers for every need</p>
+            <p className="text-gray-500 text-lg">From construction to carpentry — workers for every need</p>
           </div>
-          <div className="flex flex-wrap justify-center gap-6">
+          <div className="flex flex-wrap justify-center gap-5">
             {skillCategories.map((cat) => {
               const Icon = cat.icon;
               return (
-                <Link key={cat.name} href={`/workers?skill=${cat.name.toLowerCase()}`}>
-                  <div className={`w-32 rounded-2xl border p-5 text-center shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 cursor-pointer ${cat.bg} border-transparent hover:${cat.border}`}>
+                <Link key={cat.name} href={`/platform/workers?skill=${cat.name.toLowerCase()}`}>
+                  <div className={`w-32 rounded-2xl border border-transparent p-5 text-center shadow-[0_4px_20px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.10)] hover:-translate-y-1 transition-all duration-300 cursor-pointer ${cat.bg} hover:border-gray-200`}>
                     <div className={`w-14 h-14 mx-auto mb-3 rounded-full flex items-center justify-center bg-white shadow-sm ${cat.text}`}>
                       <Icon className="w-7 h-7" />
                     </div>
@@ -256,11 +311,11 @@ export default function HomePage() {
                     <p className="text-xs text-gray-500 mt-1">{cat.count}</p>
                   </div>
                 </Link>
-              )
+              );
             })}
           </div>
           <div className="text-center mt-8">
-            <Link href="/workers">
+            <Link href="/platform/workers">
               <Button variant="outline" className="border-2 border-blue-200 text-blue-600 hover:bg-blue-50 gap-2">
                 View All Skills <ArrowRight className="h-4 w-4" />
               </Button>
@@ -297,40 +352,39 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Testimonials ── */}
+      {/* ── Testimonials (Company) ── */}
       <section className="py-20 bg-white overflow-hidden">
         <div className="container mx-auto max-w-5xl px-4">
           <div className="text-center mb-12">
-            <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">Real Stories</span>
+            <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">Success Stories</span>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2 mb-3">
-              Trusted by Workers &amp; Contractors
+              Trusted by Leading Companies
             </h2>
+            <p className="text-gray-500">Real results from India&apos;s top construction firms</p>
           </div>
         </div>
 
-        {/* Infinite Looping Carousel */}
-        <div className="flex w-full overflow-hidden group mask-image-fade relative">
-          {/* Edge gradients to blend with white background */}
+        <div className="flex w-full overflow-hidden group relative">
           <div className="absolute top-0 bottom-0 left-0 w-24 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
           <div className="absolute top-0 bottom-0 right-0 w-24 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
-          
+
           <div className="flex w-max animate-marquee group-hover:[animation-play-state:paused]">
             {[...testimonials, ...testimonials].map((t, idx) => (
-              <div key={`${t.name}-${idx}`} className="w-[300px] sm:w-[350px] mx-3 bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 flex flex-col shrink-0">
-                <div className="flex items-center gap-1 mb-4">
+              <div key={`${t.company}-${idx}`} className="w-[320px] sm:w-[380px] mx-3 bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 flex flex-col shrink-0">
+                <Quote className="h-8 w-8 text-blue-100 mb-3" />
+                <div className="flex items-center gap-1 mb-3">
                   {Array.from({ length: t.rating }).map((_, i) => (
                     <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                   ))}
-                  {t.rating < 5 && <Star className="h-4 w-4 text-gray-300" />}
                 </div>
-                <p className="text-gray-700 text-sm leading-relaxed mb-6 italic flex-grow">&ldquo;{t.text}&rdquo;</p>
-                <div className="flex items-center gap-3 mt-auto">
-                  <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
+                <p className="text-gray-700 text-sm leading-relaxed mb-5 flex-grow">&ldquo;{t.text}&rdquo;</p>
+                <div className="flex items-center gap-3 mt-auto pt-4 border-t border-gray-50">
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${t.gradient} flex items-center justify-center shrink-0`}>
                     <span className="text-white text-xs font-bold">{t.avatar}</span>
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">{t.name}</p>
-                    <p className="text-xs text-blue-600 font-medium mt-0.5">{t.role}</p>
+                    <p className="font-bold text-gray-900 text-sm">{t.company}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{t.role}</p>
                   </div>
                 </div>
               </div>
@@ -349,7 +403,7 @@ export default function HomePage() {
             Ready to Get Started?
           </h2>
           <p className="text-blue-100 mb-8 text-lg">
-            Join 2 lakh+ workers and contractors already on Digital Labour Chowk
+            Join 2.5 Lakh+ workers and 15,000+ contractors already on Digital Labour Chowk
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
             <Link href="/register?role=WORKER">
@@ -358,7 +412,7 @@ export default function HomePage() {
               </Button>
             </Link>
             <Link href="/register?role=CONTRACTOR">
-              <Button size="lg" className="w-full sm:w-auto bg-blue-500 hover:bg-blue-400 border-2 border-blue-400 text-white font-bold gap-2 shadow-xl py-6 px-8 rounded-full text-lg transition-transform hover:scale-105">
+              <Button size="lg" className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 border-2 border-orange-400 text-white font-bold gap-2 shadow-xl py-6 px-8 rounded-full text-lg transition-transform hover:scale-105">
                 Hire Workers <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
@@ -383,9 +437,9 @@ export default function HomePage() {
               </p>
             </div>
             {[
-              { title: 'For Workers', links: [{ label: 'Register as Worker', href: '/register?role=WORKER' }, { label: 'Browse Jobs', href: '/marketplace' }, { label: 'Worker Login', href: '/login/worker' }] },
-              { title: 'For Employers', links: [{ label: 'Post a Job', href: '/register?role=CONTRACTOR' }, { label: 'Browse Workers', href: '/workers' }, { label: 'Contractor Login', href: '/login/contractor' }] },
-              { title: 'Platform', links: [{ label: 'Admin Portal', href: '/login/admin' }, { label: 'About Us', href: '/about' }, { label: 'Contact', href: '/contact' }] },
+              { title: 'For Workers', links: [{ label: 'Register as Worker', href: '/register?role=WORKER' }, { label: 'Browse Jobs', href: '/marketplace' }, { label: 'Workers Platform', href: '/platform/workers' }] },
+              { title: 'For Employers', links: [{ label: 'Post a Job', href: '/register?role=CONTRACTOR' }, { label: 'Browse Workers', href: '/workers' }, { label: 'Business Solutions', href: '/business' }] },
+              { title: 'Company', links: [{ label: 'About Us', href: '/about' }, { label: 'Active Projects', href: '/platform/projects' }, { label: 'Admin Portal', href: '/login/admin' }] },
             ].map(col => (
               <div key={col.title}>
                 <h4 className="font-semibold text-white mb-3 text-sm">{col.title}</h4>

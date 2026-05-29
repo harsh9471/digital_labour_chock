@@ -105,20 +105,20 @@ export default function WorkerDashboardPage() {
 
   if (loading) {
     return (
-      <div className="p-6 space-y-4">
-        <div className="h-32 bg-gradient-to-r from-emerald-100 to-teal-100 rounded-2xl animate-pulse" />
+      <div className="min-h-screen bg-slate-100 p-6 space-y-4">
+        <div className="h-32 bg-gradient-to-r from-emerald-200 to-teal-200 rounded-2xl animate-pulse" />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1,2,3,4].map(i => <div key={i} className="h-28 bg-gray-100 rounded-2xl animate-pulse" />)}
+          {[1,2,3,4].map(i => <div key={i} className="h-28 bg-white rounded-2xl animate-pulse" />)}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 sm:p-6 space-y-6">
+    <div className="min-h-screen bg-slate-100 p-4 sm:p-6 space-y-6">
 
       {/* ── Hero welcome banner ── */}
-      <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-700 p-6 text-white shadow-lg">
+      <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-400 via-emerald-600 to-teal-700 p-6 text-white shadow-xl">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute -top-8 -right-8 w-48 h-48 rounded-full bg-white blur-3xl" />
           <div className="absolute bottom-0 left-10 w-32 h-32 rounded-full bg-white blur-2xl" />
@@ -183,52 +183,52 @@ export default function WorkerDashboardPage() {
         <StatCard
           label="Jobs Applied" value={stats?.totalApplications ?? 0}
           icon={Briefcase} sub="All time"
-          gradient="bg-gradient-to-br from-blue-50 to-blue-100 text-blue-900"
-          iconBg="bg-blue-500 text-white"
+          gradient="bg-gradient-to-br from-blue-500 to-indigo-600 text-white"
+          iconBg="bg-white/20 text-white"
         />
         <StatCard
           label="Active Apps" value={stats?.activeApplications ?? 0}
           icon={Clock} sub="Awaiting response"
-          gradient="bg-gradient-to-br from-amber-50 to-orange-100 text-amber-900"
-          iconBg="bg-amber-500 text-white"
+          gradient="bg-gradient-to-br from-amber-500 to-orange-600 text-white"
+          iconBg="bg-white/20 text-white"
         />
         <StatCard
           label="Times Hired" value={stats?.hiredCount ?? 0}
           icon={CheckCircle} sub="Successful"
-          gradient="bg-gradient-to-br from-emerald-50 to-teal-100 text-emerald-900"
-          iconBg="bg-emerald-500 text-white"
+          gradient="bg-gradient-to-br from-emerald-500 to-teal-600 text-white"
+          iconBg="bg-white/20 text-white"
         />
         <StatCard
           label="Profile Views" value={stats?.profileViews ?? 0}
           icon={Eye} sub="Total views"
-          gradient="bg-gradient-to-br from-purple-50 to-violet-100 text-purple-900"
-          iconBg="bg-purple-500 text-white"
+          gradient="bg-gradient-to-br from-purple-500 to-violet-600 text-white"
+          iconBg="bg-white/20 text-white"
         />
         <StatCard
           label="Total Earned"
           value={formatCurrency(Number(stats?.totalEarnings ?? 0))}
           icon={IndianRupee} sub="Net earnings"
-          gradient="bg-gradient-to-br from-green-50 to-emerald-100 text-green-900"
-          iconBg="bg-green-600 text-white"
+          gradient="bg-gradient-to-br from-teal-500 to-cyan-600 text-white"
+          iconBg="bg-white/20 text-white"
         />
         <StatCard
           label="Jobs Done" value={stats?.totalJobsDone ?? 0}
           icon={TrendingUp} sub="Completed"
-          gradient="bg-gradient-to-br from-indigo-50 to-blue-100 text-indigo-900"
-          iconBg="bg-indigo-500 text-white"
+          gradient="bg-gradient-to-br from-blue-600 to-blue-700 text-white"
+          iconBg="bg-white/20 text-white"
         />
         <StatCard
           label="Saved Jobs" value={stats?.savedCount ?? 0}
           icon={Bookmark} sub="Bookmarked"
-          gradient="bg-gradient-to-br from-pink-50 to-rose-100 text-pink-900"
-          iconBg="bg-pink-500 text-white"
+          gradient="bg-gradient-to-br from-rose-500 to-pink-600 text-white"
+          iconBg="bg-white/20 text-white"
         />
         <StatCard
           label="My Rating"
           value={stats?.rating ? `${Number(stats.rating).toFixed(1)}/5` : 'N/A'}
           icon={Star} sub={stats?.totalRatings ? `${stats.totalRatings} reviews` : 'No ratings yet'}
-          gradient="bg-gradient-to-br from-yellow-50 to-amber-100 text-yellow-900"
-          iconBg="bg-yellow-500 text-white"
+          gradient="bg-gradient-to-br from-violet-500 to-purple-600 text-white"
+          iconBg="bg-white/20 text-white"
         />
       </div>
 
@@ -257,7 +257,7 @@ export default function WorkerDashboardPage() {
       </div>
 
       {/* ── Recent Applications with Pagination ── */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <div>
             <h2 className="font-semibold text-gray-900">Recent Applications</h2>
@@ -288,7 +288,7 @@ export default function WorkerDashboardPage() {
             <div className={`divide-y divide-gray-50 transition-opacity ${appsLoading ? 'opacity-50' : ''}`}>
               {applications.map((app: Application) => (
                 <Link key={app.id} href={`/marketplace/${app.job?.id}`}
-                  className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50/80 transition-colors group">
+                  className="flex items-center gap-4 px-5 py-4 border-l-4 border-transparent hover:border-emerald-400 hover:bg-emerald-50/60 transition-all duration-150 group">
                   <div className="w-10 h-10 rounded-xl bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center shrink-0 transition-colors">
                     <Briefcase className="h-4 w-4 text-emerald-600" />
                   </div>

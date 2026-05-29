@@ -204,14 +204,14 @@ export default function ContractorCompliancePage() {
       {/* Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Total',    value: summary?.total ?? '—',    color: 'text-blue-700',    bg: 'bg-blue-50' },
-          { label: 'Pending',  value: summary?.pending ?? '—',  color: 'text-amber-700',   bg: 'bg-amber-50' },
-          { label: 'Overdue',  value: summary?.overdue ?? '—',  color: 'text-red-700',     bg: 'bg-red-50' },
-          { label: 'Approved', value: summary?.approved ?? '—', color: 'text-emerald-700', bg: 'bg-emerald-50' },
+          { label: 'Total',    value: summary?.total ?? '—',    gradient: 'from-blue-600 to-blue-700',       shadow: 'shadow-blue-500/20' },
+          { label: 'Pending',  value: summary?.pending ?? '—',  gradient: 'from-amber-500 to-orange-500',    shadow: 'shadow-amber-500/20' },
+          { label: 'Overdue',  value: summary?.overdue ?? '—',  gradient: 'from-rose-500 to-pink-600',       shadow: 'shadow-rose-500/20' },
+          { label: 'Approved', value: summary?.approved ?? '—', gradient: 'from-emerald-500 to-teal-600',   shadow: 'shadow-emerald-500/20' },
         ].map(s => (
-          <div key={s.label} className={`${s.bg} rounded-2xl p-4`}>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{s.label}</p>
-            <p className={`text-2xl font-bold mt-1 ${s.color}`}>{s.value}</p>
+          <div key={s.label} className={`bg-gradient-to-br ${s.gradient} rounded-2xl p-4 text-white shadow-lg ${s.shadow}`}>
+            <p className="text-xs font-semibold uppercase tracking-wide opacity-80">{s.label}</p>
+            <p className="text-2xl font-bold mt-1">{s.value}</p>
           </div>
         ))}
       </div>
@@ -255,10 +255,21 @@ export default function ContractorCompliancePage() {
         ) : (
           <>
             <div className="divide-y divide-gray-50">
-              {filtered.map(record => (
-                <div key={record.id} className={`flex items-center gap-4 px-5 py-4 hover:bg-gray-50/80 transition-colors group ${isOverdue(record) ? 'border-l-2 border-red-400' : ''}`}>
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${isOverdue(record) ? 'bg-red-50 group-hover:bg-red-100' : 'bg-blue-50 group-hover:bg-blue-100'}`}>
-                    <Shield className={`h-4 w-4 ${isOverdue(record) ? 'text-red-500' : 'text-blue-600'}`} />
+              {filtered.map(record => {
+                const statusBorder: Record<string, string> = {
+                  PENDING:   'border-l-4 border-l-amber-400',
+                  IN_REVIEW: 'border-l-4 border-l-blue-400',
+                  APPROVED:  'border-l-4 border-l-emerald-500',
+                  REJECTED:  'border-l-4 border-l-red-400',
+                  OVERDUE:   'border-l-4 border-l-red-600',
+                };
+                const borderCls = isOverdue(record) ? 'border-l-4 border-l-red-600' : (statusBorder[record.status] ?? 'border-l-4 border-l-gray-200');
+                const iconBg = isOverdue(record) ? 'bg-red-50 group-hover:bg-red-100' : record.status === 'APPROVED' ? 'bg-emerald-50 group-hover:bg-emerald-100' : 'bg-blue-50 group-hover:bg-blue-100';
+                const iconCls = isOverdue(record) ? 'text-red-500' : record.status === 'APPROVED' ? 'text-emerald-600' : 'text-blue-600';
+                return (
+                <div key={record.id} className={`flex items-center gap-4 px-5 py-4 hover:bg-gray-50/80 transition-colors group ${borderCls}`}>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${iconBg}`}>
+                    <Shield className={`h-4 w-4 ${iconCls}`} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -281,7 +292,8 @@ export default function ContractorCompliancePage() {
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
             {totalPages > 1 && (
               <div className="px-5 py-4 border-t border-gray-100">

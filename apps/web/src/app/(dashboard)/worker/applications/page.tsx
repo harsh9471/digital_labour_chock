@@ -14,13 +14,13 @@ import { formatCurrency, formatDate } from '@/lib/utils';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Application = any;
 
-const STATUS_CONFIG: Record<string, { label: string; cls: string; icon: React.ElementType }> = {
-  SUBMITTED:   { label: 'Applied',      cls: 'bg-blue-50 text-blue-700 border-blue-200',     icon: Clock },
-  VIEWED:      { label: 'Viewed',       cls: 'bg-yellow-50 text-yellow-700 border-yellow-200', icon: Eye },
-  SHORTLISTED: { label: 'Shortlisted',  cls: 'bg-purple-50 text-purple-700 border-purple-200', icon: Star },
-  HIRED:       { label: 'Hired',        cls: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: CheckCircle },
-  REJECTED:    { label: 'Not Selected', cls: 'bg-red-50 text-red-700 border-red-200',        icon: XCircle },
-  WITHDRAWN:   { label: 'Withdrawn',    cls: 'bg-gray-50 text-gray-500 border-gray-200',     icon: RotateCcw },
+const STATUS_CONFIG: Record<string, { label: string; cls: string; icon: React.ElementType; border: string }> = {
+  SUBMITTED:   { label: 'Applied',      cls: 'bg-blue-100 text-blue-800 border-blue-300',        icon: Clock,        border: 'border-l-blue-500' },
+  VIEWED:      { label: 'Viewed',       cls: 'bg-yellow-100 text-yellow-800 border-yellow-300',  icon: Eye,          border: 'border-l-yellow-500' },
+  SHORTLISTED: { label: 'Shortlisted',  cls: 'bg-purple-100 text-purple-800 border-purple-300',  icon: Star,         border: 'border-l-purple-500' },
+  HIRED:       { label: 'Hired',        cls: 'bg-emerald-100 text-emerald-800 border-emerald-300', icon: CheckCircle, border: 'border-l-emerald-500' },
+  REJECTED:    { label: 'Not Selected', cls: 'bg-red-100 text-red-800 border-red-300',           icon: XCircle,      border: 'border-l-red-500' },
+  WITHDRAWN:   { label: 'Withdrawn',    cls: 'bg-gray-100 text-gray-600 border-gray-300',        icon: RotateCcw,    border: 'border-l-gray-400' },
 };
 
 const FILTER_TABS = [
@@ -59,8 +59,10 @@ function AppCard({ app, onWithdraw }: { app: Application; onWithdraw: (id: strin
 
   const canWithdraw = app.status === 'SUBMITTED' || app.status === 'VIEWED';
 
+  const borderClass = (STATUS_CONFIG[app.status]?.border) ?? 'border-l-gray-400';
+
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+    <div className={`bg-white rounded-2xl border border-slate-100 border-l-4 ${borderClass} shadow-sm hover:shadow-md transition-all duration-200`}>
       <div className="p-5">
         <div className="flex items-start gap-4">
           {/* Icon */}
@@ -199,7 +201,7 @@ export default function ApplicationsPage() {
   }, {} as Record<string, number>);
 
   return (
-    <div className="p-4 sm:p-6 space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-slate-100 p-4 sm:p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
@@ -210,7 +212,7 @@ export default function ApplicationsPage() {
           <p className="text-gray-500 text-sm mt-0.5">{total} application{total !== 1 ? 's' : ''} total</p>
         </div>
         <Link href="/marketplace">
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="outline" size="sm" className="gap-2 bg-white">
             <Filter className="h-4 w-4" /> Find Jobs
           </Button>
         </Link>
@@ -260,7 +262,7 @@ export default function ApplicationsPage() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-2xl border border-gray-100">
+        <div className="text-center py-20 bg-white rounded-2xl border border-slate-100 shadow-sm">
           <Briefcase className="h-12 w-12 text-gray-200 mx-auto mb-4" />
           <h3 className="font-semibold text-gray-700 text-lg">
             {search || statusFilter ? 'No matching applications' : 'No applications yet'}

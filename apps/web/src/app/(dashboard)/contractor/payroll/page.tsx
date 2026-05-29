@@ -14,10 +14,10 @@ import { formatDate } from '@/lib/utils';
 const PAGE_SIZE = 10;
 
 const STATUS_MAP: Record<string, { label: string; cls: string }> = {
-  DRAFT:      { label: 'Draft',      cls: 'bg-gray-100 text-gray-600 border-gray-200' },
-  PROCESSING: { label: 'Processing', cls: 'bg-amber-50 text-amber-700 border-amber-200' },
-  COMPLETED:  { label: 'Completed',  cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-  FAILED:     { label: 'Failed',     cls: 'bg-red-50 text-red-700 border-red-200' },
+  DRAFT:      { label: 'Draft',      cls: 'bg-slate-100 text-slate-600 border-slate-200' },
+  PROCESSING: { label: 'Processing', cls: 'bg-amber-100 text-amber-700 border-amber-300' },
+  COMPLETED:  { label: 'Completed',  cls: 'bg-emerald-100 text-emerald-700 border-emerald-300' },
+  FAILED:     { label: 'Failed',     cls: 'bg-red-100 text-red-700 border-red-300' },
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -164,15 +164,15 @@ export default function ContractorPayrollPage() {
       {/* Summary cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {[
-          { label: 'Total Batches',    value: summary?.totalBatches ?? '—',       color: 'text-blue-700',    bg: 'bg-blue-50' },
-          { label: 'Completed',        value: summary?.completedBatches ?? '—',   color: 'text-emerald-700', bg: 'bg-emerald-50' },
-          { label: 'Total Paid',       value: summary ? formatAmount(summary.totalPaid) : '—', color: 'text-green-700', bg: 'bg-green-50' },
-          { label: 'This Month',       value: summary ? formatAmount(summary.currentMonthTotal) : '—', color: 'text-indigo-700', bg: 'bg-indigo-50' },
-          { label: 'Avg Monthly',      value: summary ? formatAmount(summary.avgMonthlyPayroll) : '—', color: 'text-purple-700', bg: 'bg-purple-50' },
+          { label: 'Total Batches', value: summary?.totalBatches ?? '—',                          gradient: 'from-blue-600 to-blue-700',       shadow: 'shadow-blue-500/20' },
+          { label: 'Completed',     value: summary?.completedBatches ?? '—',                      gradient: 'from-emerald-500 to-teal-600',    shadow: 'shadow-emerald-500/20' },
+          { label: 'Total Paid',    value: summary ? formatAmount(summary.totalPaid) : '—',        gradient: 'from-green-500 to-emerald-600',   shadow: 'shadow-green-500/20' },
+          { label: 'This Month',    value: summary ? formatAmount(summary.currentMonthTotal) : '—', gradient: 'from-amber-500 to-orange-500',   shadow: 'shadow-amber-500/20' },
+          { label: 'Avg Monthly',   value: summary ? formatAmount(summary.avgMonthlyPayroll) : '—', gradient: 'from-purple-500 to-violet-600',  shadow: 'shadow-purple-500/20' },
         ].map(s => (
-          <div key={s.label} className={`${s.bg} rounded-2xl p-4`}>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide leading-tight">{s.label}</p>
-            <p className={`text-lg font-bold mt-1 ${s.color} truncate`}>{s.value}</p>
+          <div key={s.label} className={`bg-gradient-to-br ${s.gradient} rounded-2xl p-4 text-white shadow-lg ${s.shadow}`}>
+            <p className="text-xs font-semibold uppercase tracking-wide leading-tight opacity-80">{s.label}</p>
+            <p className="text-lg font-bold mt-1 truncate">{s.value}</p>
           </div>
         ))}
       </div>
