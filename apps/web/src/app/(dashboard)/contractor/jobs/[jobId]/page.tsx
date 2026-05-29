@@ -240,8 +240,14 @@ export default function ContractorJobDetailPage() {
 
               return (
                 <div key={app.id} className="flex items-start gap-4 px-5 py-4 hover:bg-gray-50 transition-colors">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-sm shrink-0">
-                    {initials}
+                  <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0">
+                    {workerUser?.avatar ? (
+                      <img src={workerUser.avatar} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-sm">
+                        {initials}
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">

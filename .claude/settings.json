@@ -28,10 +28,15 @@
       "Bash(xargs grep -l \"res\\\\.data as { data:\")",
       "Bash(xargs grep -l \"max-w-.*mx-auto\\\\|mx-auto.*max-w-\")",
       "WebFetch(domain:digitallabourchowk.com)",
-      "Bash(Remove-Item -Recurse -Force .next -ErrorAction SilentlyContinue)"
+      "Bash(Remove-Item -Recurse -Force .next -ErrorAction SilentlyContinue)",
+      "Read(//f/Yogesh/DigitalLabourChowk/apps/web/src/app/\\(dashboard\\)/contractor/jobs/**)",
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"f:\\\\Yogesh\\\\DigitalLabourChowk\\\\apps\\\\web\\\\src\\\\components\\\\home\")"
     ],
     "additionalDirectories": [
-      "f:\\Yogesh\\DigitalLabourChowk\\apps\\web\\src\\app\\(dashboard)\\contractor\\jobs"
+      "f:\\Yogesh\\DigitalLabourChowk\\apps\\web\\src\\app\\(dashboard)\\contractor\\jobs",
+      "f:\\Yogesh\\DigitalLabourChowk\\apps\\web\\src\\app\\(dashboard)\\contractor\\jobs\\[jobId]",
+      "C:\\Users\\Yogesh.suthar\\.claude\\projects\\f--Yogesh-DigitalLabourChowk",
+      "f:\\Yogesh\\DigitalLabourChowk\\apps\\web\\src\\app\\pages"
     ]
   }
 }

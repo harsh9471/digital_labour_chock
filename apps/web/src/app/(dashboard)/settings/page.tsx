@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { User, Bell, Lock, Shield, Save, Eye, EyeOff } from 'lucide-react';
+import { useRef, useState, useEffect } from 'react';
+import { User, Bell, Lock, Shield, Save, Eye, EyeOff, Camera, Upload, X, Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/store/auth.store';
 import { workersApi } from '@/lib/workers-api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,8 +9,119 @@ import { Badge } from '@/components/ui/badge';
 
 type Tab = 'profile' | 'notifications' | 'security';
 
+function AvatarSection({ user, onAvatarChange }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  user: any;
+  onAvatarChange: (url: string) => void;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [preview, setPreview] = useState<string | null>(user?.avatar ?? null);
+  const [urlInput, setUrlInput] = useState(user?.avatar ?? '');
+  const [mode, setMode] = useState<'idle' | 'file' | 'url'>('idle');
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const initials = `${user?.firstName?.[0] ?? ''}${user?.lastName?.[0] ?? ''}`;
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { alert('Please select an image under 2 MB'); return; }
+    const reader = new FileReader();
+    reader.onload = () => setPreview(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const handleSave = async () => {
+    const url = mode === 'url' ? urlInput.trim() : (preview ?? '');
+    if (!url) return;
+    setSaving(true);
+    try {
+      await workersApi.updateAvatar(url);
+      onAvatarChange(url);
+      setSaved(true);
+      setMode('idle');
+      setTimeout(() => setSaved(false), 2000);
+    } catch { alert('Failed to update photo'); } finally { setSaving(false); }
+  };
+
+  return (
+    <div className="flex items-center gap-5 mb-6 pb-6 border-b border-slate-100">
+      {/* Avatar */}
+      <div className="relative group shrink-0">
+        <div className="w-20 h-20 rounded-2xl overflow-hidden border-4 border-white shadow-lg">
+          {preview ? (
+            <img src={preview} alt="Avatar" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-2xl font-bold">
+              {initials}
+            </div>
+          )}
+        </div>
+        <button onClick={() => setMode('file')}
+          className="absolute inset-0 bg-black/50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+          <Camera className="h-6 w-6 text-white" />
+        </button>
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <p className="font-bold text-slate-900 text-lg">{user?.firstName} {user?.lastName}</p>
+        <p className="text-sm text-slate-500">{user?.email ?? user?.phone}</p>
+        <Badge variant="secondary" className="mt-1 text-xs capitalize">{user?.role?.toLowerCase().replace('_', ' ')}</Badge>
+
+        {mode === 'idle' && (
+          <div className="flex gap-2 mt-2">
+            <button onClick={() => setMode('file')}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 font-semibold transition-colors">
+              <Upload className="h-3.5 w-3.5" /> Upload Photo
+            </button>
+            <button onClick={() => setMode('url')}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 font-semibold transition-colors">
+              Link URL
+            </button>
+            {saved && <span className="flex items-center gap-1 text-xs text-emerald-600 font-semibold"><span>✓</span> Saved!</span>}
+          </div>
+        )}
+
+        {mode === 'file' && (
+          <div className="mt-2 flex items-center gap-2 flex-wrap">
+            <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
+            <button onClick={() => fileRef.current?.click()}
+              className="text-xs px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 font-semibold transition-colors">
+              Choose File
+            </button>
+            {preview && preview !== (user?.avatar ?? '') && (
+              <button onClick={handleSave} disabled={saving}
+                className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 font-semibold transition-colors">
+                {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />} Save
+              </button>
+            )}
+            <button onClick={() => setMode('idle')} className="text-gray-400 hover:text-gray-600">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
+        {mode === 'url' && (
+          <div className="mt-2 flex items-center gap-2 flex-wrap">
+            <input type="url" placeholder="https://..." value={urlInput}
+              onChange={e => { setUrlInput(e.target.value); setPreview(e.target.value || null); }}
+              className="text-xs border border-gray-200 rounded-lg px-3 py-1.5 w-56 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <button onClick={handleSave} disabled={saving || !urlInput}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 font-semibold transition-colors disabled:opacity-50">
+              {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />} Save
+            </button>
+            <button onClick={() => setMode('idle')} className="text-gray-400 hover:text-gray-600">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function SettingsPage() {
-  const { user } = useAuthStore();
+  const { user, setUser } = useAuthStore();
   const [activeTab, setActiveTab] = useState<Tab>('profile');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -101,16 +212,7 @@ export default function SettingsPage() {
             <CardTitle className="text-base font-semibold">Profile Information</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-4 mb-6 pb-6 border-b border-slate-100">
-              <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xl font-bold">
-                {user?.firstName?.[0]}{user?.lastName?.[0]}
-              </div>
-              <div>
-                <p className="font-semibold text-slate-900">{user?.firstName} {user?.lastName}</p>
-                <p className="text-sm text-slate-500">{user?.email ?? user?.phone}</p>
-                <Badge variant="secondary" className="mt-1 text-xs">{user?.role}</Badge>
-              </div>
-            </div>
+            <AvatarSection user={user} onAvatarChange={(url) => { if (user) setUser({ ...user, avatar: url }); }} />
 
             {user?.role === 'WORKER' ? (
               <form onSubmit={handleProfileSave} className="space-y-4">

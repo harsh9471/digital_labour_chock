@@ -9,7 +9,6 @@ import {
   UseGuards,
   ParseIntPipe,
   DefaultValuePipe,
-  ParseBoolPipe,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
@@ -28,6 +27,17 @@ import { UsersService } from './users.service';
 @ApiBearerAuth()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Patch('me/avatar')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update own avatar URL' })
+  async updateMyAvatar(
+    @CurrentUser() user: JwtPayload,
+    @Body('avatar') avatar: string,
+  ) {
+    const data = await this.usersService.updateAvatar(user.sub, avatar ?? '');
+    return { success: true, data, message: 'Avatar updated' };
+  }
 
   @Get('admin/stats')
   @Roles(UserRole.SUPER_ADMIN)

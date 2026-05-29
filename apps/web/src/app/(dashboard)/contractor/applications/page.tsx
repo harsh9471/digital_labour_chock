@@ -75,8 +75,14 @@ function WorkerCard({ app, jobId, onStatusChange }: {
       <div className="p-5">
         <div className="flex items-start gap-4">
           {/* Avatar */}
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
-            {initials}
+          <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0">
+            {workerUser?.avatar ? (
+              <img src={workerUser.avatar} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm">
+                {initials}
+              </div>
+            )}
           </div>
 
           {/* Content */}

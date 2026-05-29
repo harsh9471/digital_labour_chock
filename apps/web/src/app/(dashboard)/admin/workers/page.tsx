@@ -137,8 +137,14 @@ export default function AdminWorkersPage() {
                     <tr key={worker.id} className="hover:bg-slate-50/50 transition-colors">
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 font-bold text-xs shrink-0">
-                            {worker.user.firstName[0]}{worker.user.lastName[0]}
+                          <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0">
+                            {worker.user.avatar ? (
+                              <img src={worker.user.avatar} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full bg-violet-100 flex items-center justify-center text-violet-700 font-bold text-xs">
+                                {worker.user.firstName[0]}{worker.user.lastName[0]}
+                              </div>
+                            )}
                           </div>
                           <div>
                             <p className="text-sm font-medium text-slate-900">{worker.user.firstName} {worker.user.lastName}</p>

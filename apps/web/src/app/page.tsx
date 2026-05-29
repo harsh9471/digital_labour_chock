@@ -9,7 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import NavActions from '@/components/home/NavActions';
 import DynamicBanners from '@/components/home/DynamicBanners';
-import DynamicJobs from '@/components/home/DynamicJobs';
+import DynamicNavLinks from '@/components/home/DynamicNavLinks';
 
 const stats = [
   { label: 'Registered Workers', value: '2.5 Lakh+', icon: Users },
@@ -147,14 +147,13 @@ export default function HomePage() {
               { href: '/business', label: 'Business' },
               { href: '/platform/workers', label: 'Workers' },
               { href: '/platform/projects', label: 'Projects' },
-              // { href: '#how-it-works', label: 'How It Works' },
-              // { href: '#skills', label: 'Browse Skills' },
             ].map(({ href, label }) => (
               <Link key={href} href={href}
                 className="px-3 py-1.5 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-colors">
                 {label}
               </Link>
             ))}
+            <DynamicNavLinks />
           </div>
 
           <NavActions />
@@ -259,12 +258,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Dynamic Banners ── */}
-      <section className="py-10 px-4 bg-white">
-        <div className="container mx-auto max-w-5xl">
-          <DynamicBanners />
-        </div>
-      </section>
+      {/* ── Dynamic Banners — full width, no container ── */}
+      <DynamicBanners />
 
       {/* ── How It Works ── */}
       <section id="how-it-works" className="py-20 px-4 bg-gray-50">
@@ -333,8 +328,40 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Dynamic Jobs / Projects ── */}
-      <DynamicJobs />
+      {/* ── Browse Projects CTA ── */}
+      <section className="py-16 px-4 bg-white border-t border-gray-100">
+        <div className="container mx-auto max-w-5xl">
+          <div className="bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 rounded-3xl p-8 md:p-12 relative overflow-hidden shadow-2xl shadow-blue-900/20">
+            <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, #60a5fa 0%, transparent 50%), radial-gradient(circle at 80% 20%, #a78bfa 0%, transparent 50%)' }} />
+            <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-blue-500/10 blur-3xl" />
+            <div className="relative flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
+              <div>
+                <div className="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/40 rounded-full px-4 py-1.5 text-sm text-emerald-300 font-bold mb-4">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> Live Opportunities Across India
+                </div>
+                <h2 className="text-2xl md:text-4xl font-black text-white mb-3 leading-tight">
+                  Browse Available<br />Projects &amp; Jobs
+                </h2>
+                <p className="text-blue-200/80 max-w-lg text-base leading-relaxed">
+                  Hundreds of real jobs posted by verified contractors — searchable by skill, city, and job type.
+                </p>
+              </div>
+              <div className="shrink-0 flex flex-col gap-3 min-w-[240px]">
+                <Link href="/platform/projects">
+                  <Button size="lg" className="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-bold gap-2 px-8 py-4 rounded-2xl text-base shadow-xl shadow-emerald-500/30 transition-all hover:scale-105 whitespace-nowrap">
+                    View All Projects <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link href="/register?role=WORKER">
+                  <Button size="lg" className="w-full bg-white/10 hover:bg-white/20 border-2 border-white/30 hover:border-white/50 text-white font-bold gap-2 px-8 py-4 rounded-2xl text-base whitespace-nowrap transition-all">
+                    Register as Worker <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ── Features ── */}
       <section id="features" className="py-20 px-4 bg-slate-900">

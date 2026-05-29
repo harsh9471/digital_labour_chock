@@ -1,4 +1,4 @@
-import api from './api';
+import { api } from './api';
 
 export interface Banner {
   id: string;
@@ -31,18 +31,34 @@ export interface CmsPage {
   updatedAt: string;
 }
 
+/* NestJS + TransformInterceptor wraps every response as:
+   { success: true, data: T, timestamp: '...' }
+   The api.get helper returns r.data (axios layer), so callers
+   receive { success, data: T } — not T directly.
+   These helpers unwrap the inner .data so callers get the real payload. */
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const unwrapArray = <T>(res: any): T[] => {
+  if (Array.isArray(res)) return res;
+  if (Array.isArray(res?.data)) return res.data;
+  return [];
+};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const unwrapOne   = <T>(res: any): T   => res?.data ?? res;
+
 const BASE = '/cms';
 
 export const cmsApi = {
-  // Public
-  getActiveBanners: (target?: string) =>
-    api.get<Banner[]>(`${BASE}/banners/active`, { params: { target } }),
+  /* ── Public ─────────────────────────────────── */
 
-  getPublishedPages: () =>
-    api.get<CmsPage[]>(`${BASE}/pages/published`),
+  getActiveBanners: (target?: string): Promise<Banner[]> =>
+    api.get(`${BASE}/banners/active`, { params: { target } }).then(unwrapArray<Banner>),
 
-  getPageBySlug: (slug: string) =>
-    api.get<CmsPage>(`${BASE}/pages/slug/${slug}`),
+  getPublishedPages: (): Promise<CmsPage[]> =>
+    api.get(`${BASE}/pages/published`).then(unwrapArray<CmsPage>),
+
+  getPageBySlug: (slug: string): Promise<CmsPage> =>
+    api.get(`${BASE}/pages/slug/${slug}`).then(unwrapOne<CmsPage>),
 
   trackBannerClick: (id: string) =>
     api.post(`${BASE}/banners/${id}/click`),
@@ -50,31 +66,33 @@ export const cmsApi = {
   trackBannerView: (id: string) =>
     api.post(`${BASE}/banners/${id}/view`),
 
-  // Admin: Banners
-  getAllBanners: (target?: string) =>
-    api.get<Banner[]>(`${BASE}/banners`, { params: { target } }),
+  /* ── Admin: Banners ─────────────────────────── */
+
+  getAllBanners: (): Promise<Banner[]> =>
+    api.get(`${BASE}/banners`).then(unwrapArray<Banner>),
 
   createBanner: (data: Partial<Banner>) =>
-    api.post<Banner>(`${BASE}/banners`, data),
+    api.post(`${BASE}/banners`, data),
 
   updateBanner: (id: string, data: Partial<Banner>) =>
-    api.patch<Banner>(`${BASE}/banners/${id}`, data),
+    api.patch(`${BASE}/banners/${id}`, data),
 
   deleteBanner: (id: string) =>
     api.delete(`${BASE}/banners/${id}`),
 
-  // Admin: Pages
-  getAllPages: () =>
-    api.get<CmsPage[]>(`${BASE}/pages`),
+  /* ── Admin: Pages ───────────────────────────── */
+
+  getAllPages: (): Promise<CmsPage[]> =>
+    api.get(`${BASE}/pages`).then(unwrapArray<CmsPage>),
 
   createPage: (data: Partial<CmsPage>) =>
-    api.post<CmsPage>(`${BASE}/pages`, data),
+    api.post(`${BASE}/pages`, data),
 
-  getPage: (id: string) =>
-    api.get<CmsPage>(`${BASE}/pages/${id}`),
+  getPage: (id: string): Promise<CmsPage> =>
+    api.get(`${BASE}/pages/${id}`).then(unwrapOne<CmsPage>),
 
   updatePage: (id: string, data: Partial<CmsPage>) =>
-    api.patch<CmsPage>(`${BASE}/pages/${id}`, data),
+    api.patch(`${BASE}/pages/${id}`, data),
 
   deletePage: (id: string) =>
     api.delete(`${BASE}/pages/${id}`),

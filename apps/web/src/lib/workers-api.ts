@@ -84,4 +84,7 @@ export const workersApi = {
 
   getRatings: (workerId: string): Promise<PaginatedApiResponse<unknown>> =>
     api.get(`/workers/${workerId}/ratings`),
+
+  updateAvatar: (avatarUrl: string): Promise<{ success: boolean; data: { id: string; avatar: string | null } }> =>
+    api.patch('/users/me/avatar', { avatar: avatarUrl }),
 };

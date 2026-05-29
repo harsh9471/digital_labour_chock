@@ -236,6 +236,16 @@ export class UsersService {
     };
   }
 
+  async updateAvatar(userId: string, avatarUrl: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId, deletedAt: null } });
+    if (!user) throw new NotFoundException('User not found');
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { avatar: avatarUrl || null },
+      select: { id: true, avatar: true },
+    });
+  }
+
   async getAdminStats() {
     const [totalWorkers, totalContractors, totalCompanies, totalJobs, pendingKyc, pendingVerifications] = await Promise.all([
       this.prisma.worker.count({ where: { deletedAt: null } }),
