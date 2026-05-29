@@ -663,9 +663,109 @@ async function main() {
   });
   console.log('✅  Hire Records (11)');
 
+  // ── DAY 5: Notification Templates ──────────────────────────────────
+  await prisma.notificationTemplate.createMany({
+    data: [
+      { name: 'job_application_received', type: 'JOB_APPLICATION', channel: 'IN_APP', titleTemplate: 'New Application for {{jobTitle}}', bodyTemplate: '{{workerName}} has applied for your job posting "{{jobTitle}}". Review their profile and respond.', variables: ['jobTitle', 'workerName'], isActive: true },
+      { name: 'application_hired', type: 'WORKER_HIRED', channel: 'IN_APP', titleTemplate: 'You have been hired!', bodyTemplate: 'Congratulations! {{contractorName}} has hired you for the role of {{jobTitle}}. Report to {{siteName}} on {{startDate}}.', variables: ['contractorName', 'jobTitle', 'siteName', 'startDate'], isActive: true },
+      { name: 'application_rejected', type: 'APPLICATION_UPDATE', channel: 'IN_APP', titleTemplate: 'Application Update', bodyTemplate: 'Your application for "{{jobTitle}}" has been reviewed. Unfortunately, you were not selected for this position.', variables: ['jobTitle'], isActive: true },
+      { name: 'payroll_processed', type: 'PAYROLL_PROCESSED', channel: 'IN_APP', titleTemplate: '₹{{amount}} Payroll Processed', bodyTemplate: 'Your payroll of ₹{{amount}} for the period {{periodStart}} to {{periodEnd}} has been processed. Check your bank account.', variables: ['amount', 'periodStart', 'periodEnd'], isActive: true },
+      { name: 'kyc_verified', type: 'KYC_UPDATE', channel: 'IN_APP', titleTemplate: 'KYC Verification Successful', bodyTemplate: 'Your {{documentType}} has been verified. Your profile is now fully verified and you can apply for more jobs!', variables: ['documentType'], isActive: true },
+      { name: 'kyc_rejected', type: 'KYC_UPDATE', channel: 'IN_APP', titleTemplate: 'KYC Document Rejected', bodyTemplate: 'Your {{documentType}} verification was rejected. Reason: {{reason}}. Please re-upload a clear copy.', variables: ['documentType', 'reason'], isActive: true },
+      { name: 'compliance_due', type: 'COMPLIANCE_ALERT', channel: 'IN_APP', titleTemplate: 'Compliance Due in {{days}} Days', bodyTemplate: 'Your {{complianceType}} for project "{{projectName}}" is due on {{dueDate}}. Please take action immediately.', variables: ['days', 'complianceType', 'projectName', 'dueDate'], isActive: true },
+      { name: 'attendance_checkin', type: 'ATTENDANCE_CHECKIN', channel: 'IN_APP', titleTemplate: 'Attendance Marked', bodyTemplate: 'Check-in recorded at {{time}} for {{siteName}}. Have a productive day!', variables: ['time', 'siteName'], isActive: true },
+    ],
+    skipDuplicates: true,
+  });
+  console.log('✅  Notification Templates (8)');
+
+  // ── DAY 5: Sample Notifications ────────────────────────────────────
+  await prisma.notification.createMany({
+    data: [
+      { userId: 'usr_wkr_01', title: 'New Job Match!', body: 'A new Masonry job in Mumbai matches your skills. Apply now!', type: 'JOB_POSTED', channel: 'IN_APP', isRead: false },
+      { userId: 'usr_wkr_01', title: 'You have been hired!', body: 'Congratulations! Sharma Constructions has hired you for BKC Tower Project.', type: 'WORKER_HIRED', channel: 'IN_APP', isRead: true },
+      { userId: 'usr_wkr_01', title: 'Payroll Processed', body: 'Your payroll of ₹15,356 for May has been processed. Payment coming soon.', type: 'PAYROLL_PROCESSED', channel: 'IN_APP', isRead: false },
+      { userId: 'usr_con_01', title: 'New Application', body: 'Rajesh Kumar has applied for your job "Senior Mason – High Rise Project".', type: 'JOB_APPLICATION', channel: 'IN_APP', isRead: false },
+      { userId: 'usr_con_01', title: 'Compliance Alert', body: 'Your Safety Audit for Andheri Residential is due in 15 days. Take action!', type: 'COMPLIANCE_ALERT', channel: 'IN_APP', isRead: true },
+      { userId: 'usr_adm_01', title: 'New User Registration', body: '5 new users registered today. Review pending KYC documents.', type: 'SYSTEM_ALERT', channel: 'IN_APP', isRead: false },
+      { userId: 'usr_adm_01', title: 'Platform Summary', body: '125 jobs posted this week. 480 new applications. Platform health: Good.', type: 'GENERAL', channel: 'IN_APP', isRead: true },
+    ],
+    skipDuplicates: true,
+  });
+  console.log('✅  Sample Notifications (7)');
+
+  // ── DAY 5: Banners ─────────────────────────────────────────────────
+  await prisma.banner.createMany({
+    data: [
+      { title: 'Find Work Near You', subtitle: 'Browse 10,000+ jobs across India', imageUrl: '/banners/find-work.jpg', linkUrl: '/marketplace', linkText: 'Browse Jobs', target: 'WORKER', status: 'ACTIVE', priority: 10, clickCount: 245, viewCount: 1840 },
+      { title: 'Hire Verified Workers', subtitle: 'Post a job and hire today — 100% KYC verified', imageUrl: '/banners/hire-workers.jpg', linkUrl: '/contractor/jobs/new', linkText: 'Post a Job', target: 'CONTRACTOR', status: 'ACTIVE', priority: 10, clickCount: 189, viewCount: 1320 },
+      { title: 'Complete Your KYC', subtitle: 'Get KYC verified to unlock more job opportunities', imageUrl: '/banners/kyc.jpg', linkUrl: '/worker/profile', linkText: 'Verify Now', target: 'WORKER', status: 'ACTIVE', priority: 5, clickCount: 98, viewCount: 750 },
+      { title: 'New: Compliance Tracking', subtitle: 'Manage all your regulatory requirements in one place', imageUrl: '/banners/compliance.jpg', linkUrl: '/contractor/compliance', linkText: 'Explore', target: 'CONTRACTOR', status: 'ACTIVE', priority: 3, clickCount: 56, viewCount: 430 },
+      { title: 'Welcome to Digital Labour Chowk', subtitle: "India's #1 Labour Marketplace — Connect, Hire, Grow", imageUrl: '/banners/welcome.jpg', linkUrl: '/register', linkText: 'Get Started', target: 'ALL', status: 'ACTIVE', priority: 8, clickCount: 520, viewCount: 4200 },
+    ],
+    skipDuplicates: true,
+  });
+  console.log('✅  Banners (5)');
+
+  // ── DAY 5: CMS Pages ───────────────────────────────────────────────
+  await prisma.cmsPage.createMany({
+    data: [
+      { title: 'About Us', slug: 'about', content: '<h1>About Digital Labour Chowk</h1><p>Digital Labour Chowk is India\'s most trusted digital labour marketplace, connecting skilled daily-wage workers with contractors and employers across 100+ cities.</p><p>Our mission is to bring dignity, transparency, and technology to the unorganized labour sector in India.</p>', excerpt: 'Learn about Digital Labour Chowk — India\'s #1 Labour Marketplace.', status: 'PUBLISHED', publishedAt: new Date() },
+      { title: 'Terms of Service', slug: 'terms', content: '<h1>Terms of Service</h1><p>By accessing and using the Digital Labour Chowk platform, you agree to be bound by these terms and conditions.</p><h2>User Responsibilities</h2><p>All users must provide accurate information and use the platform in good faith.</p>', excerpt: 'Read our Terms of Service for using the Digital Labour Chowk platform.', status: 'PUBLISHED', publishedAt: new Date() },
+      { title: 'Privacy Policy', slug: 'privacy', content: '<h1>Privacy Policy</h1><p>We are committed to protecting your personal information. This Privacy Policy describes how we collect, use, and safeguard your data.</p><h2>Data We Collect</h2><p>We collect information you provide during registration, job applications, and platform usage.</p>', excerpt: 'Understand how we collect, use and protect your personal data.', status: 'PUBLISHED', publishedAt: new Date() },
+      { title: 'FAQ', slug: 'faq', content: '<h1>Frequently Asked Questions</h1><h2>For Workers</h2><p><strong>How do I find a job?</strong> Browse the marketplace and apply to jobs that match your skills.</p><h2>For Contractors</h2><p><strong>How do I post a job?</strong> Register as a contractor and use the Post a Job feature.</p>', excerpt: 'Common questions about using Digital Labour Chowk platform.', status: 'PUBLISHED', publishedAt: new Date() },
+      { title: 'Contact Us', slug: 'contact', content: '<h1>Contact Us</h1><p>Need help? Our support team is here to assist you.</p><p>Email: support@digitallabourchwk.in</p><p>Phone: 1800-XXX-XXXX (Toll-free)</p><p>Hours: Monday to Saturday, 9 AM – 6 PM</p>', excerpt: 'Get in touch with our support team.', status: 'PUBLISHED', publishedAt: new Date() },
+      { title: 'Safety Guidelines', slug: 'safety', content: '<h1>Safety Guidelines</h1><p>Your safety is our top priority. All workers and contractors must adhere to our safety guidelines.</p>', excerpt: 'Important safety guidelines for all platform users.', status: 'DRAFT' },
+    ],
+    skipDuplicates: true,
+  });
+  console.log('✅  CMS Pages (6)');
+
+  // ── DAY 5: Roles & Permissions ─────────────────────────────────────
+  await prisma.permission.createMany({
+    data: [
+      { name: 'users:read',           resource: 'users',       action: 'read',           description: 'View user records' },
+      { name: 'users:write',          resource: 'users',       action: 'write',          description: 'Create and update users' },
+      { name: 'users:delete',         resource: 'users',       action: 'delete',         description: 'Delete user accounts' },
+      { name: 'users:ban',            resource: 'users',       action: 'ban',            description: 'Suspend or ban users' },
+      { name: 'jobs:read',            resource: 'jobs',        action: 'read',           description: 'View all job postings' },
+      { name: 'jobs:moderate',        resource: 'jobs',        action: 'moderate',       description: 'Approve or remove job postings' },
+      { name: 'kyc:verify',           resource: 'kyc',         action: 'verify',         description: 'Approve or reject KYC documents' },
+      { name: 'payroll:read',         resource: 'payroll',     action: 'read',           description: 'View payroll records' },
+      { name: 'reports:generate',     resource: 'reports',     action: 'generate',       description: 'Generate platform reports' },
+      { name: 'cms:write',            resource: 'cms',         action: 'write',          description: 'Create and update CMS content' },
+      { name: 'notifications:send',   resource: 'notifications', action: 'send',         description: 'Send notifications to users' },
+      { name: 'analytics:read',       resource: 'analytics',   action: 'read',           description: 'View analytics dashboards' },
+    ],
+    skipDuplicates: true,
+  });
+  console.log('✅  Permissions (12)');
+
+  await prisma.role.createMany({
+    data: [
+      { name: 'super_admin', displayName: 'Super Admin', description: 'Full platform access', isSystem: true },
+      { name: 'content_manager', displayName: 'Content Manager', description: 'Manage CMS and banners', isSystem: false },
+      { name: 'support_agent', displayName: 'Support Agent', description: 'Handle complaints and user queries', isSystem: false },
+      { name: 'analyst', displayName: 'Analyst', description: 'View analytics and generate reports', isSystem: false },
+    ],
+    skipDuplicates: true,
+  });
+  console.log('✅  Roles (4)');
+
+  // ── DAY 5: Admin Reports ──────────────────────────────────────────
+  await prisma.adminReport.createMany({
+    data: [
+      { title: 'May 2026 Platform Overview', type: 'PLATFORM_OVERVIEW', data: { totalUsers: 45, workers: 30, contractors: 10, companies: 5, totalJobs: 50, applications: 120, hired: 22 }, periodStart: new Date('2026-05-01'), periodEnd: new Date('2026-05-31') },
+      { title: 'Q1 2026 Revenue Report', type: 'REVENUE_REPORT', data: { totalRevenue: 154200, breakdown: [{ month: '2026-01', revenue: 48000 }, { month: '2026-02', revenue: 52000 }, { month: '2026-03', revenue: 54200 }] }, periodStart: new Date('2026-01-01'), periodEnd: new Date('2026-03-31') },
+      { title: 'May 2026 Hiring Analytics', type: 'HIRING_ANALYTICS', data: { total: 120, conversionRate: 18, byJobType: [{ type: 'DAILY', count: 45 }, { type: 'WEEKLY', count: 55 }, { type: 'CONTRACT', count: 20 }] }, periodStart: new Date('2026-05-01'), periodEnd: new Date('2026-05-31') },
+    ],
+    skipDuplicates: true,
+  });
+  console.log('✅  Admin Reports (3)');
+
   console.log('\n🎉  Seed complete!');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log('📊  Records: Locations | Skills | Admins | Companies | Contractors | Workers | Sites | Jobs | Applications | Projects | WorkforceAssignments | Compliance | Attendance | Payroll');
+  console.log('📊  Records: Locations | Skills | Admins | Companies | Contractors | Workers | Sites | Jobs | Applications | Projects | WorkforceAssignments | Compliance | Attendance | Payroll | Notifications | Banners | CMS | Roles | Permissions | Reports');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 }
 

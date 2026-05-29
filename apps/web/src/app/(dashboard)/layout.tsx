@@ -11,6 +11,7 @@ import {
   CalendarCheck, Wallet, AlertCircle, Building,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/auth.store';
+import NotificationBell from '@/components/notifications/NotificationBell';
 
 interface NavItem {
   label: string;
@@ -50,18 +51,26 @@ const NAV_ITEMS: NavItem[] = [
 
   // Super Admin
   { label: 'Dashboard',       href: '/admin',                       icon: LayoutDashboard, roles: ['SUPER_ADMIN'],       section: 'main' },
-  { label: 'Workers',         href: '/admin/workers',               icon: Users,           roles: ['SUPER_ADMIN'],       section: 'manage' },
+  { label: 'Users',           href: '/admin/users',                 icon: Users,           roles: ['SUPER_ADMIN'],       section: 'manage' },
+  { label: 'Workers',         href: '/admin/workers',               icon: UserCircle,      roles: ['SUPER_ADMIN'],       section: 'manage' },
   { label: 'Contractors',     href: '/contractors',                 icon: Briefcase,       roles: ['SUPER_ADMIN'],       section: 'manage' },
   { label: 'Companies',       href: '/admin/companies',             icon: Building2,       roles: ['SUPER_ADMIN'],       section: 'manage' },
   { label: 'Verifications',   href: '/admin/kyc',                   icon: Shield,          roles: ['SUPER_ADMIN'],       section: 'manage' },
   { label: 'Complaints',      href: '/admin/complaints',            icon: AlertCircle,     roles: ['SUPER_ADMIN'],       section: 'manage' },
-  { label: 'Analytics',       href: '/admin/analytics',             icon: BarChart2,       roles: ['SUPER_ADMIN'],       section: 'manage' },
-  { label: 'Settings',        href: '/admin/settings',              icon: Settings,        roles: ['SUPER_ADMIN'],       section: 'manage' },
+  { label: 'Analytics',       href: '/admin/analytics',             icon: BarChart2,       roles: ['SUPER_ADMIN'],       section: 'analytics' },
+  { label: 'Reports',         href: '/admin/reports',               icon: FileText,        roles: ['SUPER_ADMIN'],       section: 'analytics' },
+  { label: 'Roles',           href: '/admin/roles',                 icon: Shield,          roles: ['SUPER_ADMIN'],       section: 'config' },
+  { label: 'Notifications',   href: '/admin/notifications',         icon: Bell,            roles: ['SUPER_ADMIN'],       section: 'config' },
+  { label: 'Banners',         href: '/admin/banners',               icon: Zap,             roles: ['SUPER_ADMIN'],       section: 'config' },
+  { label: 'CMS Pages',       href: '/admin/cms',                   icon: FileText,        roles: ['SUPER_ADMIN'],       section: 'config' },
+  { label: 'Audit Logs',      href: '/admin/audit-logs',            icon: ClipboardList,   roles: ['SUPER_ADMIN'],       section: 'config' },
+  { label: 'Settings',        href: '/admin/settings',              icon: Settings,        roles: ['SUPER_ADMIN'],       section: 'config' },
 ];
 
 const SECTION_LABELS: Record<string, string> = {
   main: '', jobs: 'Jobs', team: 'Team', operations: 'Operations',
   company: 'Company', manage: 'Manage', account: 'Account',
+  analytics: 'Analytics', config: 'Configuration',
 };
 
 // ─── Role-based theme ────────────────────────────────────────────────────────
@@ -401,6 +410,14 @@ function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
     if (pathname.startsWith('/admin/companies')) return 'Companies';
     if (pathname.startsWith('/admin/complaints')) return 'Complaints';
     if (pathname.startsWith('/admin/settings')) return 'Admin Settings';
+    if (pathname.startsWith('/admin/users')) return 'User Management';
+    if (pathname.startsWith('/admin/roles')) return 'Role Management';
+    if (pathname.startsWith('/admin/notifications')) return 'Notifications';
+    if (pathname.startsWith('/admin/banners')) return 'Banner Management';
+    if (pathname.startsWith('/admin/cms')) return 'CMS Pages';
+    if (pathname.startsWith('/admin/reports')) return 'Reports';
+    if (pathname.startsWith('/admin/audit-logs')) return 'Audit Logs';
+    if (pathname.startsWith('/notifications')) return 'Notifications';
     if (pathname === '/workers') return 'Workers';
     if (pathname === '/sites') return 'Sites';
     if (pathname.startsWith('/worker/attendance')) return 'My Attendance';
@@ -439,14 +456,7 @@ function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
       {/* Right side */}
       <div className="flex items-center gap-1.5">
         {/* Notification bell */}
-        <button
-          type="button"
-          className="relative p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors"
-          aria-label="Notifications"
-        >
-          <Bell className="h-5 w-5" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 border-2 border-white" />
-        </button>
+        <NotificationBell />
 
         {/* Quick action hint on mobile */}
         <button

@@ -21,6 +21,10 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { ComplianceModule } from './compliance/compliance.module';
 import { CompanyModule } from './company/company.module';
 import { ComplaintsModule } from './complaints/complaints.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { CmsModule } from './cms/cms.module';
+import { AdminModule } from './admin/admin.module';
+import { ReportsModule } from './reports/reports.module';
 import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
@@ -61,6 +65,10 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
     ComplianceModule,
     CompanyModule,
     ComplaintsModule,
+    NotificationsModule,
+    CmsModule,
+    AdminModule,
+    ReportsModule,
   ],
   providers: [
     {

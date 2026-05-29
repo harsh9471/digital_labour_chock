@@ -873,9 +873,34 @@ enum NotificationType {
   ATTENDANCE_CHECKIN
   PAYROLL_PROCESSED
   KYC_UPDATE
+  COMPLIANCE_ALERT
+  PAYMENT_RECEIVED
+  JOB_POSTED
+  WORKER_HIRED
+  COMPLAINT_UPDATE
+  SYSTEM_ALERT
   GENERAL
 
   @@map("notification_type")
+}
+
+enum NotificationChannel {
+  IN_APP
+  PUSH
+  SMS
+  EMAIL
+
+  @@map("notification_channel")
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+  READ
+
+  @@map("notification_status")
 }
 
 model Notification {
@@ -884,16 +909,61 @@ model Notification {
   title     String
   body      String
   type      NotificationType @default(GENERAL)
+  channel   NotificationChannel @default(IN_APP)
   isRead    Boolean          @default(false)
   data      Json?
+  imageUrl  String?
+  actionUrl String?
   readAt    DateTime?
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
 
+  logs NotificationLog[]
+
   @@index([userId])
   @@index([isRead])
   @@index([type])
+  @@index([channel])
+  @@index([createdAt])
   @@map("notifications")
+}
+
+model NotificationTemplate {
+  id          String           @id @default(cuid())
+  name        String           @unique
+  type        NotificationType
+  channel     NotificationChannel
+  titleTemplate String
+  bodyTemplate  String
+  isActive    Boolean          @default(true)
+  variables   String[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([type])
+  @@index([channel])
+  @@index([isActive])
+  @@map("notification_templates")
+}
+
+model NotificationLog {
+  id             String              @id @default(cuid())
+  notificationId String
+  channel        NotificationChannel
+  status         NotificationStatus  @default(PENDING)
+  recipient      String
+  providerRef    String?
+  errorMessage   String?
+  sentAt         DateTime?
+  deliveredAt    DateTime?
+  createdAt      DateTime            @default(now())
+
+  notification Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@index([notificationId])
+  @@index([status])
+  @@index([channel])
+  @@map("notification_logs")
 }
 
 // ============================================================
@@ -1110,6 +1180,121 @@ model AuditLog {
   @@index([action])
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+// ============================================================
+// CMS & BANNERS
+// ============================================================
+
+enum BannerStatus {
+  ACTIVE
+  INACTIVE
+  SCHEDULED
+  EXPIRED
+
+  @@map("banner_status")
+}
+
+enum BannerTarget {
+  ALL
+  WORKER
+  CONTRACTOR
+  COMPANY_ADMIN
+
+  @@map("banner_target")
+}
+
+enum CmsPageStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+
+  @@map("cms_page_status")
+}
+
+model Banner {
+  id          String       @id @default(cuid())
+  title       String
+  subtitle    String?
+  imageUrl    String
+  linkUrl     String?
+  linkText    String?
+  target      BannerTarget @default(ALL)
+  status      BannerStatus @default(ACTIVE)
+  priority    Int          @default(0)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  clickCount  Int          @default(0)
+  viewCount   Int          @default(0)
+  createdBy   String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
+
+  @@index([status])
+  @@index([target])
+  @@index([priority])
+  @@index([deletedAt])
+  @@map("banners")
+}
+
+model CmsPage {
+  id          String        @id @default(cuid())
+  title       String
+  slug        String        @unique
+  content     String        @db.Text
+  excerpt     String?
+  metaTitle   String?
+  metaDesc    String?
+  status      CmsPageStatus @default(DRAFT)
+  publishedAt DateTime?
+  createdBy   String?
+  updatedBy   String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  deletedAt   DateTime?
+
+  @@index([slug])
+  @@index([status])
+  @@index([deletedAt])
+  @@map("cms_pages")
+}
+
+// ============================================================
+// REPORTS
+// ============================================================
+
+enum AdminReportType {
+  PLATFORM_OVERVIEW
+  REVENUE_REPORT
+  HIRING_ANALYTICS
+  WORKFORCE_ANALYTICS
+  ATTENDANCE_ANALYTICS
+  COMPLIANCE_REPORT
+  USER_ACTIVITY
+  CUSTOM
+
+  @@map("admin_report_type")
+}
+
+model AdminReport {
+  id          String          @id @default(cuid())
+  title       String
+  type        AdminReportType
+  data        Json?
+  fileUrl     String?
+  periodStart DateTime?
+  periodEnd   DateTime?
+  createdBy   String?
+  isScheduled Boolean         @default(false)
+  schedule    String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([type])
+  @@index([createdBy])
+  @@index([createdAt])
+  @@map("admin_reports")
 }
 
 // ============================================================
