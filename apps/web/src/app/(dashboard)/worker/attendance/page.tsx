@@ -9,14 +9,15 @@ import { attendanceApi } from '@/lib/attendance-api';
 import type { AttendanceRecord } from '@/lib/attendance-api';
 import { useAuthStore } from '@/store/auth.store';
 
-/* ── status badge styles ── */
-const STATUS_STYLES: Record<string, string> = {
-  PRESENT:  'bg-emerald-100 text-emerald-700 border-emerald-300',
-  ABSENT:   'bg-red-100 text-red-700 border-red-300',
-  HALF_DAY: 'bg-yellow-100 text-yellow-700 border-yellow-300',
-  HOLIDAY:  'bg-blue-100 text-blue-700 border-blue-300',
-  LEAVE:    'bg-purple-100 text-purple-700 border-purple-300',
-};
+/* ── derive a display status from check-in/out times ── */
+function deriveStatus(r: { checkInTime?: string; checkOutTime?: string; totalHours?: number }) {
+  if (!r.checkInTime) return { label: 'No Record', cls: 'bg-slate-100 text-slate-500 border-slate-200' };
+  if (!r.checkOutTime) return { label: 'In Progress', cls: 'bg-blue-100 text-blue-700 border-blue-300' };
+  const hours = r.totalHours ?? 0;
+  if (hours >= 7) return { label: 'Present', cls: 'bg-emerald-100 text-emerald-700 border-emerald-300' };
+  if (hours >= 4) return { label: 'Half Day', cls: 'bg-yellow-100 text-yellow-700 border-yellow-300' };
+  return { label: 'Short Day', cls: 'bg-orange-100 text-orange-700 border-orange-300' };
+}
 
 /* ── small toast ── */
 function Toast({ msg, ok }: { msg: string; ok: boolean }) {
@@ -51,37 +52,38 @@ export default function WorkerAttendancePage() {
   /* filters */
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
 
   /* monthly summary computed from loaded data */
   const [summary, setSummary] = useState({ present: 0, absent: 0, halfDay: 0, totalHours: 0 });
 
-  /* today's record (first PRESENT record from today if any) */
+  /* today's record — match on checkInTime date (no separate 'date' field) */
   const todayStr = now.toISOString().split('T')[0];
   const todayRecord = records.find(
-    (r) => r.date?.startsWith(todayStr) && (r.status === 'PRESENT' || r.checkInTime)
+    (r) => r.checkInTime?.startsWith(todayStr)
   ) ?? null;
   const isSignedIn = !!todayRecord?.checkInTime && !todayRecord?.checkOutTime;
 
-  /* ── fetch ── */
+  /* ── fetch worker's own attendance records ── */
   const fetchAttendance = useCallback(async () => {
     if (!user?.id) return;
     setLoading(true);
     try {
-      const res = await attendanceApi.list({
+      const res = await attendanceApi.workerList({
         page,
         limit: 30,
-        workerId: user.id,
-        startDate: startDate || undefined,
-        endDate: endDate || undefined,
-        status: statusFilter || undefined,
+        dateFrom: startDate || undefined,
+        dateTo: endDate || undefined,
       });
       setRecords(res.data);
       setTotal(res.meta.total);
       setTotalPages(res.meta.totalPages);
-      const present    = res.data.filter((r) => r.status === 'PRESENT').length;
-      const absent     = res.data.filter((r) => r.status === 'ABSENT').length;
-      const halfDay    = res.data.filter((r) => r.status === 'HALF_DAY').length;
+      // Compute summary from loaded records
+      const present    = res.data.filter((r) => !!r.checkInTime && !!r.checkOutTime).length;
+      const absent     = 0; // absent records are not self-created; show present/checked-in only
+      const halfDay    = res.data.filter((r) => {
+        if (!r.totalHours) return false;
+        return r.totalHours < 5;
+      }).length;
       const totalHours = res.data.reduce((acc, r) => acc + (r.totalHours ?? 0), 0);
       setSummary({ present, absent, halfDay, totalHours });
     } catch {
@@ -89,7 +91,7 @@ export default function WorkerAttendancePage() {
     } finally {
       setLoading(false);
     }
-  }, [page, user?.id, startDate, endDate, statusFilter]);
+  }, [page, user?.id, startDate, endDate]);
 
   useEffect(() => { fetchAttendance(); }, [fetchAttendance]);
 
@@ -99,35 +101,31 @@ export default function WorkerAttendancePage() {
     setTimeout(() => setToast(null), 3500);
   };
 
-  /* ── sign in ── */
+  /* ── sign in — calls worker self check-in endpoint ── */
   const handleSignIn = async () => {
-    if (!user?.id) return;
     setActionLoading(true);
     try {
-      await attendanceApi.checkIn({
-        workerId: user.id,
-        siteId: 'demo-site-001',
-        notes: 'Checked in via app',
-      });
-      showToast('Signed in successfully!', true);
+      await attendanceApi.workerCheckIn({ notes: 'Checked in via app' });
+      showToast('Signed in successfully! Have a great day.', true);
       await fetchAttendance();
-    } catch {
-      showToast('Failed to sign in. Please try again.', false);
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      showToast(msg ?? 'Failed to sign in. Please try again.', false);
     } finally {
       setActionLoading(false);
     }
   };
 
-  /* ── sign out ── */
+  /* ── sign out — calls worker self check-out endpoint ── */
   const handleSignOut = async () => {
-    if (!todayRecord?.id) return;
     setActionLoading(true);
     try {
-      await attendanceApi.checkOut(todayRecord.id, { notes: 'Checked out via app' });
-      showToast('Signed out successfully!', true);
+      await attendanceApi.workerCheckOut({ notes: 'Checked out via app' });
+      showToast('Signed out successfully! Great work today.', true);
       await fetchAttendance();
-    } catch {
-      showToast('Failed to sign out. Please try again.', false);
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      showToast(msg ?? 'Failed to sign out. Please try again.', false);
     } finally {
       setActionLoading(false);
     }
@@ -145,14 +143,14 @@ export default function WorkerAttendancePage() {
     new Date(iso).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
   /* hours worked today */
-  const hoursToday = todayRecord?.totalHours
-    ? `${Number(todayRecord.totalHours).toFixed(1)}h`
-    : todayRecord?.checkInTime
-    ? (() => {
-        const diff = (Date.now() - new Date(todayRecord.checkInTime).getTime()) / 3_600_000;
-        return `${diff.toFixed(1)}h`;
-      })()
-    : '0h';
+  const hoursToday = (() => {
+    if (todayRecord?.totalHours) return `${Number(todayRecord.totalHours).toFixed(1)}h`;
+    if (todayRecord?.checkInTime) {
+      const diff = (Date.now() - new Date(todayRecord.checkInTime).getTime()) / 3_600_000;
+      return `${Math.max(0, diff).toFixed(1)}h`;
+    }
+    return '0h';
+  })();
 
   return (
     <div className="min-h-screen bg-slate-100 p-4 sm:p-6 space-y-6">
@@ -307,7 +305,7 @@ export default function WorkerAttendancePage() {
           <div className="flex items-start justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide opacity-75">Total Hours</p>
-              <p className="text-3xl font-bold mt-1">{summary.totalHours.toFixed(0)}h</p>
+              <p className="text-3xl font-bold mt-1">{Number(summary.totalHours ?? 0).toFixed(0)}h</p>
             </div>
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
               <Clock className="h-5 w-5" />
@@ -349,21 +347,6 @@ export default function WorkerAttendancePage() {
               className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
-          <div className="flex-1">
-            <label className="block text-xs font-medium text-slate-500 mb-1">Status</label>
-            <select
-              value={statusFilter}
-              onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
-            >
-              <option value="">All Statuses</option>
-              <option value="PRESENT">Present</option>
-              <option value="ABSENT">Absent</option>
-              <option value="HALF_DAY">Half Day</option>
-              <option value="HOLIDAY">Holiday</option>
-              <option value="LEAVE">Leave</option>
-            </select>
-          </div>
         </div>
       </div>
 
@@ -401,15 +384,17 @@ export default function WorkerAttendancePage() {
                 {records.map((record) => (
                   <tr key={record.id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="py-3 px-4 text-sm font-medium text-slate-800">
-                      {fmtDate(record.date)}
+                      {record.checkInTime ? fmtDate(record.checkInTime) : '—'}
                     </td>
                     <td className="py-3 px-4 text-sm text-slate-600">
                       {record.site?.name ?? '—'}
                     </td>
                     <td className="py-3 px-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${STATUS_STYLES[record.status] ?? 'bg-slate-50 text-slate-600 border-slate-200'}`}>
-                        {record.status.replace('_', ' ')}
-                      </span>
+                      {(() => { const s = deriveStatus(record); return (
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${s.cls}`}>
+                          {s.label}
+                        </span>
+                      ); })()}
                     </td>
                     <td className="py-3 px-4 text-sm text-slate-600">{fmtTime(record.checkInTime)}</td>
                     <td className="py-3 px-4 text-sm text-slate-600">{fmtTime(record.checkOutTime)}</td>

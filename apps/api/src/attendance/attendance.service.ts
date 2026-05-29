@@ -3,7 +3,7 @@ import {
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { AttendanceFilterDto, CheckOutDto, MarkAttendanceDto } from './dto/attendance.dto';
+import { AttendanceFilterDto, CheckOutDto, MarkAttendanceDto, WorkerSelfCheckInDto } from './dto/attendance.dto';
 
 @Injectable()
 export class AttendanceService {
@@ -15,6 +15,136 @@ export class AttendanceService {
     const c = await this.prisma.contractor.findUnique({ where: { userId, deletedAt: null }, select: { id: true } });
     if (!c) throw new NotFoundException('Contractor profile not found');
     return c;
+  }
+
+  private async getWorkerOrFail(userId: string) {
+    const w = await this.prisma.worker.findUnique({ where: { userId, deletedAt: null }, select: { id: true } });
+    if (!w) throw new NotFoundException('Worker profile not found');
+    return w;
+  }
+
+  // ── WORKER SELF CHECK-IN ──────────────────────────────────────────
+  // Resolves jobId / siteId / contractorId from the worker's most recent active hire record.
+  async workerSelfCheckIn(userId: string, dto: WorkerSelfCheckInDto) {
+    const worker = await this.getWorkerOrFail(userId);
+
+    // Find the most recent active hire record for this worker
+    const hire = await this.prisma.hireRecord.findFirst({
+      where: { workerId: worker.id, isActive: true },
+      orderBy: { startDate: 'desc' },
+      select: { jobId: true, siteId: true, contractorId: true },
+    });
+
+    if (!hire) {
+      throw new BadRequestException('No active job assignment found. You must be hired for a job before checking in.');
+    }
+
+    // Prevent duplicate active check-in
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const existing = await this.prisma.attendanceRecord.findFirst({
+      where: { workerId: worker.id, checkInTime: { gte: today }, checkOutTime: null },
+    });
+    if (existing) throw new BadRequestException('You are already checked in for today.');
+
+    const record = await this.prisma.attendanceRecord.create({
+      data: {
+        workerId: worker.id,
+        jobId: hire.jobId,
+        siteId: hire.siteId ?? hire.jobId, // fallback to jobId if no site
+        contractorId: hire.contractorId,
+        checkInTime: new Date(),
+        checkInLat: dto.checkInLat ?? null,
+        checkInLon: dto.checkInLon ?? null,
+        method: dto.method ?? 'GPS',
+        geoFenceValid: true,
+        notes: dto.notes ?? null,
+      },
+      include: {
+        site: { select: { id: true, name: true, city: true } },
+        job: { select: { id: true, title: true } },
+      },
+    });
+
+    this.logger.log(`Worker self check-in: ${worker.id} at ${record.checkInTime}`);
+    return record;
+  }
+
+  // ── WORKER SELF CHECK-OUT ─────────────────────────────────────────
+  async workerSelfCheckOut(userId: string, dto: CheckOutDto) {
+    const worker = await this.getWorkerOrFail(userId);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const record = await this.prisma.attendanceRecord.findFirst({
+      where: { workerId: worker.id, checkInTime: { gte: today }, checkOutTime: null },
+      orderBy: { checkInTime: 'desc' },
+    });
+
+    if (!record) throw new BadRequestException("No open check-in found for today. Please check in first.");
+
+    const checkOut = new Date();
+    const totalHours = parseFloat(((checkOut.getTime() - record.checkInTime.getTime()) / 3_600_000).toFixed(2));
+
+    const updated = await this.prisma.attendanceRecord.update({
+      where: { id: record.id },
+      data: {
+        checkOutTime: checkOut,
+        checkOutLat: dto.checkOutLat ?? null,
+        checkOutLon: dto.checkOutLon ?? null,
+        totalHours,
+        notes: dto.notes ?? record.notes,
+      },
+      include: {
+        site: { select: { id: true, name: true, city: true } },
+        job: { select: { id: true, title: true } },
+      },
+    });
+
+    this.logger.log(`Worker self check-out: ${worker.id}, hours: ${totalHours}`);
+    return updated;
+  }
+
+  // ── WORKER OWN ATTENDANCE LIST ────────────────────────────────────
+  async findWorkerOwnAttendance(userId: string, filters: AttendanceFilterDto) {
+    const worker = await this.getWorkerOrFail(userId);
+    const { page = 1, limit = 20, dateFrom, dateTo, siteId } = filters;
+    const skip = (page - 1) * limit;
+
+    const where: Prisma.AttendanceRecordWhereInput = { workerId: worker.id };
+    if (siteId) where.siteId = siteId;
+    if (dateFrom || dateTo) {
+      where.checkInTime = {};
+      if (dateFrom) (where.checkInTime as Prisma.DateTimeFilter).gte = new Date(dateFrom);
+      if (dateTo) {
+        const end = new Date(dateTo);
+        end.setHours(23, 59, 59, 999);
+        (where.checkInTime as Prisma.DateTimeFilter).lte = end;
+      }
+    }
+
+    const [data, total] = await Promise.all([
+      this.prisma.attendanceRecord.findMany({
+        where, skip, take: limit,
+        orderBy: { checkInTime: 'desc' },
+        include: {
+          site: { select: { id: true, name: true, city: true } },
+          job: { select: { id: true, title: true } },
+        },
+      }),
+      this.prisma.attendanceRecord.count({ where }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        total, page, limit,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPrevPage: page > 1,
+      },
+    };
   }
 
   // ── MARK CHECK-IN (contractor can mark on behalf) ─────────────────

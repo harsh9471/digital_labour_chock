@@ -9,59 +9,57 @@ export interface AttendanceRecord {
   workerId: string;
   siteId: string;
   contractorId: string;
-  date: string;
   checkInTime?: string;
   checkOutTime?: string;
   totalHours?: number;
-  status: 'PRESENT' | 'ABSENT' | 'HALF_DAY' | 'HOLIDAY' | 'LEAVE';
   notes?: string;
-  worker?: { id: string; user: { firstName: string; lastName: string; avatar?: string; }; };
-  site?: { id: string; name: string; city: string; };
-}
-
-export interface TodaySummary {
-  date: string;
-  totalPresent: number;
-  totalAbsent: number;
-  totalHalfDay: number;
-  attendanceRate: number;
-  records: AttendanceRecord[];
-}
-
-export interface WeeklyStats {
-  week: string;
-  avgAttendanceRate: number;
-  totalWorkHours: number;
-  presentCount: number;
-  absentCount: number;
-  byDay: { date: string; presentCount: number; absentCount: number; rate: number; }[];
+  worker?: { id: string; user: { firstName: string; lastName: string; avatar?: string } };
+  site?: { id: string; name: string; city: string };
+  job?: { id: string; title: string };
 }
 
 export const attendanceApi = {
-  list: (params?: { page?: number; limit?: number; workerId?: string; siteId?: string; startDate?: string; endDate?: string; status?: string }): Promise<PaginatedApiResponse<AttendanceRecord>> => {
+  // ── Worker self check-in/out ─────────────────────────────────────
+  // Calls the WORKER-role endpoints that auto-resolve job/site from hire record.
+  workerCheckIn: (payload?: { checkInLat?: number; checkInLon?: number; notes?: string }): Promise<ApiResponse<AttendanceRecord>> =>
+    api.post('/attendance/worker/check-in', payload ?? {}),
+
+  workerCheckOut: (payload?: { checkOutLat?: number; checkOutLon?: number; notes?: string }): Promise<ApiResponse<AttendanceRecord>> =>
+    api.patch('/attendance/worker/check-out', payload ?? {}),
+
+  workerList: (params?: { page?: number; limit?: number; siteId?: string; dateFrom?: string; dateTo?: string }): Promise<PaginatedApiResponse<AttendanceRecord>> => {
     const q = new URLSearchParams();
-    if (params?.page) q.set('page', String(params.page));
-    if (params?.limit) q.set('limit', String(params.limit));
+    if (params?.page)     q.set('page',     String(params.page));
+    if (params?.limit)    q.set('limit',    String(params.limit));
+    if (params?.siteId)   q.set('siteId',   params.siteId);
+    if (params?.dateFrom) q.set('dateFrom', params.dateFrom);
+    if (params?.dateTo)   q.set('dateTo',   params.dateTo);
+    return api.get(`/attendance/worker?${q.toString()}`);
+  },
+
+  // ── Contractor endpoints (mark on behalf of workers) ─────────────
+  list: (params?: { page?: number; limit?: number; workerId?: string; siteId?: string; dateFrom?: string; dateTo?: string; search?: string; status?: string }): Promise<PaginatedApiResponse<AttendanceRecord>> => {
+    const q = new URLSearchParams();
+    if (params?.page)     q.set('page',     String(params.page));
+    if (params?.limit)    q.set('limit',    String(params.limit));
     if (params?.workerId) q.set('workerId', params.workerId);
-    if (params?.siteId) q.set('siteId', params.siteId);
-    if (params?.startDate) q.set('startDate', params.startDate);
-    if (params?.endDate) q.set('endDate', params.endDate);
-    if (params?.status) q.set('status', params.status);
+    if (params?.siteId)   q.set('siteId',   params.siteId);
+    if (params?.dateFrom) q.set('dateFrom', params.dateFrom);
+    if (params?.dateTo)   q.set('dateTo',   params.dateTo);
+    if (params?.search)   q.set('search',   params.search);
+    if (params?.status)   q.set('status',   params.status);
     return api.get(`/attendance?${q.toString()}`);
   },
 
-  getToday: (): Promise<ApiResponse<TodaySummary>> =>
-    api.get('/attendance/today'),
-
-  getWeeklyStats: (): Promise<ApiResponse<WeeklyStats>> =>
-    api.get('/attendance/weekly-stats'),
-
-  getById: (id: string): Promise<ApiResponse<AttendanceRecord>> =>
-    api.get(`/attendance/${id}`),
-
-  checkIn: (payload: { workerId: string; siteId: string; date?: string; notes?: string }): Promise<ApiResponse<AttendanceRecord>> =>
+  checkIn: (payload: { workerId: string; jobId: string; siteId: string; notes?: string }): Promise<ApiResponse<AttendanceRecord>> =>
     api.post('/attendance/check-in', payload),
 
-  checkOut: (id: string, payload?: { notes?: string }): Promise<ApiResponse<AttendanceRecord>> =>
-    api.patch(`/attendance/${id}/check-out`, payload ?? {}),
+  checkOut: (recordId: string, payload?: { notes?: string }): Promise<ApiResponse<AttendanceRecord>> =>
+    api.patch(`/attendance/${recordId}/check-out`, payload ?? {}),
+
+  getToday: (): Promise<ApiResponse<unknown>> =>
+    api.get('/attendance/today'),
+
+  getWeeklyStats: (): Promise<ApiResponse<unknown>> =>
+    api.get('/attendance/weekly-stats'),
 };

@@ -39,6 +39,31 @@ export class MarkAttendanceDto {
   notes?: string;
 }
 
+// Worker self-check-in — jobId/siteId/contractorId resolved from active hire record
+export class WorkerSelfCheckInDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  checkInLat?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  checkInLon?: number;
+
+  @ApiPropertyOptional({ enum: AttendanceMethod })
+  @IsOptional()
+  @IsEnum(AttendanceMethod)
+  method?: AttendanceMethod;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  notes?: string;
+}
+
 export class CheckOutDto {
   @ApiPropertyOptional()
   @IsOptional()

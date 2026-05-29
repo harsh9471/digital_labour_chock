@@ -12,17 +12,17 @@ import { formatDate } from '@/lib/utils';
 
 const PAGE_SIZE = 15;
 
-const STATUS_MAP: Record<string, { label: string; icon: React.ElementType; cls: string }> = {
-  PRESENT:  { label: 'Present',  icon: CheckCircle, cls: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
-  ABSENT:   { label: 'Absent',   icon: XCircle,     cls: 'text-red-500 bg-red-50 border-red-200' },
-  HALF_DAY: { label: 'Half Day', icon: MinusCircle, cls: 'text-amber-600 bg-amber-50 border-amber-200' },
-  HOLIDAY:  { label: 'Holiday',  icon: CalendarCheck, cls: 'text-blue-600 bg-blue-50 border-blue-200' },
-  LEAVE:    { label: 'Leave',    icon: MinusCircle, cls: 'text-purple-600 bg-purple-50 border-purple-200' },
-};
+function deriveAttendanceStatus(r: { checkInTime?: string; checkOutTime?: string; totalHours?: number }) {
+  if (!r.checkInTime) return { label: 'Absent',      icon: XCircle,     cls: 'text-red-500 bg-red-50 border-red-200',            border: 'border-l-4 border-l-red-400' };
+  if (!r.checkOutTime) return { label: 'In Progress', icon: MinusCircle, cls: 'text-blue-600 bg-blue-50 border-blue-200',          border: 'border-l-4 border-l-blue-400' };
+  const h = r.totalHours ?? 0;
+  if (h >= 7) return { label: 'Present',   icon: CheckCircle,  cls: 'text-emerald-600 bg-emerald-50 border-emerald-200', border: 'border-l-4 border-l-emerald-500' };
+  if (h >= 4) return { label: 'Half Day',  icon: MinusCircle,  cls: 'text-amber-600 bg-amber-50 border-amber-200',       border: 'border-l-4 border-l-amber-400' };
+  return          { label: 'Short Day', icon: MinusCircle,  cls: 'text-orange-600 bg-orange-50 border-orange-200',   border: 'border-l-4 border-l-orange-400' };
+}
 
-function StatusBadge({ status }: { status: string }) {
-  const s = STATUS_MAP[status];
-  if (!s) return <span className="text-xs text-gray-400">{status}</span>;
+function StatusBadge({ record }: { record: { checkInTime?: string; checkOutTime?: string; totalHours?: number } }) {
+  const s = deriveAttendanceStatus(record);
   const Icon = s.icon;
   return (
     <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full border ${s.cls}`}>
@@ -48,14 +48,14 @@ export default function ContractorAttendancePage() {
         attendanceApi.list({
           page, limit: PAGE_SIZE,
           status: statusFilter || undefined,
-          startDate: dateFilter || undefined,
-          endDate: dateFilter || undefined,
+          dateFrom: dateFilter || undefined,
+          dateTo: dateFilter || undefined,
         }),
         attendanceApi.getToday().catch(() => null),
       ]);
       setRecords(listRes.data ?? []);
       setTotal(listRes.meta?.total ?? 0);
-      if (todayRes?.data) setTodaySummary(todayRes.data);
+      if (todayRes?.data) setTodaySummary(todayRes.data as { totalPresent: number; totalAbsent: number; totalHalfDay: number; attendanceRate: number });
     } catch {
       setRecords([]);
     } finally {
@@ -127,8 +127,8 @@ export default function ContractorAttendancePage() {
           className="rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
         >
           <option value="">All Statuses</option>
-          {Object.entries(STATUS_MAP).map(([val, { label }]) => (
-            <option key={val} value={val}>{label}</option>
+          {[{v:'PRESENT',l:'Present'},{v:'ABSENT',l:'Absent'},{v:'HALF_DAY',l:'Half Day'}].map(({v, l}) => (
+            <option key={v} value={v}>{l}</option>
           ))}
         </select>
       </div>
@@ -170,17 +170,14 @@ export default function ContractorAttendancePage() {
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {filtered.map(r => {
-                    const rowBorder = r.status === 'PRESENT' ? 'border-l-4 border-l-emerald-500'
-                      : r.status === 'ABSENT' ? 'border-l-4 border-l-red-400'
-                      : r.status === 'HALF_DAY' ? 'border-l-4 border-l-amber-400'
-                      : 'border-l-4 border-l-transparent';
+                    const rowBorder = deriveAttendanceStatus(r).border;
                     return (
                     <tr key={r.id} className={`hover:bg-gray-50/50 transition-colors ${rowBorder}`}>
                       <td className="px-5 py-3.5 font-medium text-gray-900">
                         {r.worker?.user.firstName} {r.worker?.user.lastName}
                       </td>
                       <td className="px-5 py-3.5 text-gray-500">{r.site?.name ?? '—'}</td>
-                      <td className="px-5 py-3.5 text-gray-500">{formatDate(r.date)}</td>
+                      <td className="px-5 py-3.5 text-gray-500">{r.checkInTime ? formatDate(r.checkInTime) : '—'}</td>
                       <td className="px-5 py-3.5 text-gray-500">
                         {r.checkInTime ? new Date(r.checkInTime).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '—'}
                       </td>
@@ -190,7 +187,7 @@ export default function ContractorAttendancePage() {
                       <td className="px-5 py-3.5 text-gray-700 font-medium">
                         {r.totalHours != null ? `${Number(r.totalHours).toFixed(1)}h` : '—'}
                       </td>
-                      <td className="px-5 py-3.5"><StatusBadge status={r.status} /></td>
+                      <td className="px-5 py-3.5"><StatusBadge record={r} /></td>
                     </tr>
                     );
                   })}
@@ -201,21 +198,18 @@ export default function ContractorAttendancePage() {
             {/* Mobile cards */}
             <div className="md:hidden divide-y divide-gray-50">
               {filtered.map(r => {
-                const mobileBorder = r.status === 'PRESENT' ? 'border-l-4 border-l-emerald-500'
-                  : r.status === 'ABSENT' ? 'border-l-4 border-l-red-400'
-                  : r.status === 'HALF_DAY' ? 'border-l-4 border-l-amber-400'
-                  : 'border-l-4 border-l-transparent';
+                const mobileBorder = deriveAttendanceStatus(r).border;
                 return (
                 <div key={r.id} className={`px-4 py-3.5 space-y-2 ${mobileBorder}`}>
                   <div className="flex items-center justify-between">
                     <p className="font-semibold text-gray-900 text-sm">
                       {r.worker?.user.firstName} {r.worker?.user.lastName}
                     </p>
-                    <StatusBadge status={r.status} />
+                    <StatusBadge record={r} />
                   </div>
                   <div className="flex gap-4 text-xs text-gray-500">
                     <span>{r.site?.name ?? '—'}</span>
-                    <span>{formatDate(r.date)}</span>
+                    <span>{r.checkInTime ? formatDate(r.checkInTime) : '—'}</span>
                     {r.totalHours != null && <span className="font-medium text-gray-700">{Number(r.totalHours).toFixed(1)}h</span>}
                   </div>
                 </div>

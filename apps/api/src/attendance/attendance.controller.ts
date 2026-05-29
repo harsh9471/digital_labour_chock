@@ -8,7 +8,7 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { AttendanceService } from './attendance.service';
-import { AttendanceFilterDto, CheckOutDto, MarkAttendanceDto } from './dto/attendance.dto';
+import { AttendanceFilterDto, CheckOutDto, MarkAttendanceDto, WorkerSelfCheckInDto } from './dto/attendance.dto';
 
 @ApiTags('Attendance')
 @Controller('attendance')
@@ -17,9 +17,38 @@ import { AttendanceFilterDto, CheckOutDto, MarkAttendanceDto } from './dto/atten
 export class AttendanceController {
   constructor(private readonly attendanceService: AttendanceService) {}
 
+  // ── Worker self check-in/out (WORKER role) ───────────────────────
+
+  @Post('worker/check-in')
+  @Roles('WORKER')
+  @ApiOperation({ summary: 'Worker self check-in (resolves site/job from active hire)' })
+  async workerCheckIn(@CurrentUser() user: JwtPayload, @Body() dto: WorkerSelfCheckInDto) {
+    const data = await this.attendanceService.workerSelfCheckIn(user.sub, dto);
+    return { success: true, data, message: 'Checked in successfully' };
+  }
+
+  @Patch('worker/check-out')
+  @Roles('WORKER')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Worker self check-out (closes today's open check-in)" })
+  async workerCheckOut(@CurrentUser() user: JwtPayload, @Body() dto: CheckOutDto) {
+    const data = await this.attendanceService.workerSelfCheckOut(user.sub, dto);
+    return { success: true, data, message: 'Checked out successfully' };
+  }
+
+  @Get('worker')
+  @Roles('WORKER')
+  @ApiOperation({ summary: "Worker's own attendance records" })
+  async workerAttendance(@CurrentUser() user: JwtPayload, @Query() filters: AttendanceFilterDto) {
+    const result = await this.attendanceService.findWorkerOwnAttendance(user.sub, filters);
+    return { success: true, ...result, message: 'Attendance records retrieved' };
+  }
+
+  // ── Contractor / Company Admin endpoints ──────────────────────────
+
   @Post('check-in')
   @Roles('CONTRACTOR', 'COMPANY_ADMIN')
-  @ApiOperation({ summary: 'Mark worker check-in' })
+  @ApiOperation({ summary: 'Mark worker check-in (contractor marks on behalf)' })
   async markCheckIn(@CurrentUser() user: JwtPayload, @Body() dto: MarkAttendanceDto) {
     const data = await this.attendanceService.markCheckIn(user.sub, dto);
     return { success: true, data, message: 'Check-in recorded' };
@@ -28,7 +57,7 @@ export class AttendanceController {
   @Patch(':recordId/check-out')
   @Roles('CONTRACTOR', 'COMPANY_ADMIN')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Mark worker check-out' })
+  @ApiOperation({ summary: 'Mark worker check-out (contractor marks on behalf)' })
   @ApiParam({ name: 'recordId' })
   async markCheckOut(
     @CurrentUser() user: JwtPayload,
@@ -41,7 +70,7 @@ export class AttendanceController {
 
   @Get()
   @Roles('CONTRACTOR', 'COMPANY_ADMIN')
-  @ApiOperation({ summary: 'List attendance records with filters' })
+  @ApiOperation({ summary: 'List attendance records with filters (contractor view)' })
   async findAll(@CurrentUser() user: JwtPayload, @Query() filters: AttendanceFilterDto) {
     const result = await this.attendanceService.findContractorAttendance(user.sub, filters);
     return { success: true, ...result, message: 'Attendance records retrieved' };
