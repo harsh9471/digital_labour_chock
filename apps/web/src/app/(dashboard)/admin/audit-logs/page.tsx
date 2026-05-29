@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { adminPanelApi, AuditLog } from '@/lib/admin-panel-api';
 import { Button } from '@/components/ui/button';
 import { Search, FileText, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
@@ -100,8 +100,8 @@ export default function AdminAuditLogsPage() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {logs.map((log) => (
-                <>
-                  <tr key={log.id} className="hover:bg-gray-50 transition-colors">
+                <React.Fragment key={log.id}>
+                  <tr className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3">
                       <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${ACTION_COLORS[log.action] ?? 'bg-gray-100 text-gray-700'}`}>
                         {log.action.replace(/_/g, ' ')}
@@ -134,7 +134,7 @@ export default function AdminAuditLogsPage() {
                     </td>
                   </tr>
                   {expanded === log.id && (log.before || log.after) && (
-                    <tr key={`${log.id}-expanded`} className="bg-gray-50">
+                    <tr className="bg-gray-50">
                       <td colSpan={6} className="px-4 py-3">
                         <div className="grid grid-cols-2 gap-4 text-xs font-mono">
                           {log.before && (
@@ -157,7 +157,7 @@ export default function AdminAuditLogsPage() {
                       </td>
                     </tr>
                   )}
-                </>
+                </React.Fragment>
               ))}
             </tbody>
           </table>
