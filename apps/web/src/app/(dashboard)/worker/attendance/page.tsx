@@ -109,8 +109,17 @@ export default function WorkerAttendancePage() {
       showToast('Signed in successfully! Have a great day.', true);
       await fetchAttendance();
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      showToast(msg ?? 'Failed to sign in. Please try again.', false);
+      const raw = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      // Provide friendlier messages for known backend errors
+      let msg = raw ?? 'Failed to sign in. Please try again.';
+      if (raw?.includes('No active job assignment')) {
+        msg = 'You are not assigned to an active job yet. Contact your contractor to get hired first.';
+      } else if (raw?.includes('No site assigned')) {
+        msg = 'No site assigned to your job. Ask your contractor to add a site to the job.';
+      } else if (raw?.includes('already checked in')) {
+        msg = 'You are already signed in for today. Sign out first before signing in again.';
+      }
+      showToast(msg, false);
     } finally {
       setActionLoading(false);
     }
@@ -124,8 +133,12 @@ export default function WorkerAttendancePage() {
       showToast('Signed out successfully! Great work today.', true);
       await fetchAttendance();
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      showToast(msg ?? 'Failed to sign out. Please try again.', false);
+      const raw = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      let msg = raw ?? 'Failed to sign out. Please try again.';
+      if (raw?.includes('No open check-in') || raw?.includes('not checked in')) {
+        msg = 'You have not signed in yet today. Please sign in first.';
+      }
+      showToast(msg, false);
     } finally {
       setActionLoading(false);
     }

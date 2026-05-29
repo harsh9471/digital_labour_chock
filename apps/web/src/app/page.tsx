@@ -8,6 +8,8 @@ import {
 
 import { Button } from '@/components/ui/button';
 import NavActions from '@/components/home/NavActions';
+import DynamicBanners from '@/components/home/DynamicBanners';
+import DynamicJobs from '@/components/home/DynamicJobs';
 
 const stats = [
   { label: 'Registered Workers', value: '2.5 Lakh+', icon: Users },
@@ -145,8 +147,8 @@ export default function HomePage() {
               { href: '/business', label: 'Business' },
               { href: '/platform/workers', label: 'Workers' },
               { href: '/platform/projects', label: 'Projects' },
-              { href: '#how-it-works', label: 'How It Works' },
-              { href: '#skills', label: 'Browse Skills' },
+              // { href: '#how-it-works', label: 'How It Works' },
+              // { href: '#skills', label: 'Browse Skills' },
             ].map(({ href, label }) => (
               <Link key={href} href={href}
                 className="px-3 py-1.5 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-colors">
@@ -257,6 +259,13 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Dynamic Banners ── */}
+      <section className="py-10 px-4 bg-white">
+        <div className="container mx-auto max-w-5xl">
+          <DynamicBanners />
+        </div>
+      </section>
+
       {/* ── How It Works ── */}
       <section id="how-it-works" className="py-20 px-4 bg-gray-50">
         <div className="container mx-auto max-w-6xl">
@@ -323,6 +332,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ── Dynamic Jobs / Projects ── */}
+      <DynamicJobs />
 
       {/* ── Features ── */}
       <section id="features" className="py-20 px-4 bg-slate-900">
