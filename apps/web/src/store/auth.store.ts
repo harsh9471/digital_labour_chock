@@ -4,21 +4,6 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { api, tokenStorage } from '@/lib/api';
 import type { AuthState, AuthTokens, LoginFormData, LoginResponse, OtpFormData, RegisterFormData, User } from '@/types';
 
-// Session cookie for middleware route protection (not for auth data storage)
-const sessionCookie = {
-  set: (role: string) => {
-    if (typeof document === 'undefined') return;
-    const maxAge = 7 * 24 * 60 * 60;
-    document.cookie = `dlc_session=1; path=/; max-age=${maxAge}; SameSite=Lax`;
-    document.cookie = `dlc_role=${role}; path=/; max-age=${maxAge}; SameSite=Lax`;
-  },
-  clear: () => {
-    if (typeof document === 'undefined') return;
-    document.cookie = 'dlc_session=; path=/; max-age=0; SameSite=Lax';
-    document.cookie = 'dlc_role=; path=/; max-age=0; SameSite=Lax';
-  },
-};
-
 interface AuthActions {
   login: (data: LoginFormData) => Promise<LoginResponse>;
   loginWithOtp: (data: OtpFormData) => Promise<LoginResponse>;
@@ -40,11 +25,22 @@ const initialState: AuthState = {
   isLoading: false,
 };
 
-// Each tab gets its own sessionStorage, so Worker/Contractor/Admin can be
-// logged in simultaneously in different tabs without conflicts.
-const tabStorage = createJSONStorage(() =>
-  typeof window !== 'undefined' ? sessionStorage : localStorage,
-);
+// Per-tab storage: each browser tab maintains its own auth session.
+// This allows Worker, Contractor, and Admin to be logged in simultaneously
+// in separate tabs without overwriting each other.
+// sessionStorage persists across page refreshes within the same tab,
+// but is isolated between tabs — exactly what we need.
+const perTabStorage = createJSONStorage(() => {
+  if (typeof window === 'undefined') {
+    // SSR fallback: no-op storage (server never needs auth state)
+    return {
+      getItem: () => null,
+      setItem: () => {},
+      removeItem: () => {},
+    };
+  }
+  return sessionStorage;
+});
 
 export const useAuthStore = create<AuthStore>()(
   persist(
@@ -57,7 +53,6 @@ export const useAuthStore = create<AuthStore>()(
           const response = await api.post<{ success: boolean; data: LoginResponse }>('/auth/login/email', data);
           const { user, tokens } = response.data;
           tokenStorage.setTokens(tokens.accessToken, tokens.refreshToken);
-          sessionCookie.set(user.role);
           set({ user, tokens, isAuthenticated: true, isLoading: false });
           return response.data;
         } catch (error) {
@@ -78,7 +73,6 @@ export const useAuthStore = create<AuthStore>()(
           const response = await api.post<{ success: boolean; data: LoginResponse }>('/auth/otp/verify', data);
           const { user, tokens } = response.data;
           tokenStorage.setTokens(tokens.accessToken, tokens.refreshToken);
-          sessionCookie.set(user.role);
           set({ user, tokens, isAuthenticated: true, isLoading: false });
           return response.data;
         } catch (error) {
@@ -103,10 +97,9 @@ export const useAuthStore = create<AuthStore>()(
           const { tokens } = get();
           if (tokens) await api.post('/auth/logout');
         } catch {
-          // ignore
+          // ignore network errors on logout
         } finally {
           tokenStorage.clearTokens();
-          sessionCookie.clear();
           set(initialState);
         }
       },
@@ -118,12 +111,9 @@ export const useAuthStore = create<AuthStore>()(
           const response = await api.post<{ success: boolean; data: AuthTokens }>('/auth/refresh', { refreshToken });
           const tokens = response.data;
           tokenStorage.setTokens(tokens.accessToken, tokens.refreshToken);
-          const currentRole = get().user?.role ?? '';
-          sessionCookie.set(currentRole);
           set({ tokens, isAuthenticated: true });
         } catch {
           tokenStorage.clearTokens();
-          sessionCookie.clear();
           set(initialState);
         }
       },
@@ -132,13 +122,12 @@ export const useAuthStore = create<AuthStore>()(
       setTokens: (tokens: AuthTokens) => set({ tokens, isAuthenticated: true }),
       clearAuth: () => {
         tokenStorage.clearTokens();
-        sessionCookie.clear();
         set(initialState);
       },
     }),
     {
       name: 'dlc-auth',
-      storage: tabStorage,
+      storage: perTabStorage,
       partialize: (state) => ({
         user: state.user,
         tokens: state.tokens,

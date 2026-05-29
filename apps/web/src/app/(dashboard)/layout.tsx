@@ -490,7 +490,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
 
   useEffect(() => {
-    setHydrated(true);
+    // Manually trigger Zustand rehydration from sessionStorage, then mark hydrated.
+    // This ensures the auth state is loaded before we check isAuthenticated below.
+    const unsubFinish = useAuthStore.persist.onFinishHydration(() => {
+      setHydrated(true);
+    });
+    useAuthStore.persist.rehydrate();
+    return () => unsubFinish();
   }, []);
 
   useEffect(() => {
